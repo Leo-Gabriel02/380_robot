@@ -50,13 +50,7 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-I2C_HandleTypeDef hi2c1;
 
-
-int status;
-VL53LX_Dev_t                   dev;
-VL53LX_DEV                     Dev = &dev;
-volatile int IntCount;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,13 +61,38 @@ static void MX_TIM1_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
-static void MX_I2C1_Init(void);
+//static void MX_I2C1_Init(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void driveFast() {
+	char b[] = "Driving fast!\r\n";
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
+}
+
+void lineFollow() {
+	char b[] = "Following the line?\r\n";
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+}
+
+void shoot() {
+	char b[] = "goodbye mr lego man\r\n";
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+}
+
+void surprise() {
+	char b[] = "surprise :0\r\n";
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+	while (1) {
+		HAL_GPIO_TogglePin (LED_GPIO_Port, LED_Pin);
+		HAL_Delay (100);
+	}
+}
 
 
 
@@ -86,13 +105,10 @@ static void MX_I2C1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint8_t byteData;
-	uint16_t wordData;
-	VL53LX_MultiRangingData_t MultiRangingData;
-	VL53LX_MultiRangingData_t *pMultiRangingData = &MultiRangingData;
-	uint8_t NewDataReady=0;
-	int no_of_object_found=0,j;
+	uint16_t mode_a = MODE_A_GPIO_Port->IDR & MODE_A_Pin;
+	uint16_t mode_b = MODE_B_GPIO_Port->IDR & MODE_B_Pin;
 
+	uint8_t mode = mode_a | mode_b<<1;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -118,58 +134,28 @@ int main(void)
   MX_ADC2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  MX_I2C1_Init();
-  printf("VL53L4CX Examples...\n");
-  Dev->I2cHandle = &hi2c1;
-  Dev->I2cDevAddr = 0x29;
-  /* Initialize distance sensor */
+  //MX_I2C1_Init();
 
-  VL53LX_WaitDeviceBooted(Dev);
-  VL53LX_DataInit(Dev);
-  VL53LX_SetCalibrationData(Dev);
-
-
-  VL53LX_RdByte(Dev, 0x010F, &byteData);
-  printf("VL53L4CX Model_ID: %02X\n\r", byteData);
-  VL53LX_RdByte(Dev, 0x0110, &byteData);
-  printf("VL53L4CX Module_Type: %02X\n\r", byteData);
-  VL53LX_RdWord(Dev, 0x010F, &wordData);
-  printf("VL53L4CX: %02X\n\r", wordData);
-
-  printf("Ranging loop starts\n");
-  status = VL53LX_WaitDeviceBooted(Dev);
-  status = VL53LX_DataInit(Dev);
-  status = VL53LX_StartMeasurement(Dev);
-  if(status){
-	printf("VL53LX_StartMeasurement failed: error = %d \n", status);
-	while(1);
+  switch (mode) {
+  case 0:
+  	driveFast();
+  case 1:
+  	lineFollow();
+  case 2:
+  	shoot();
+  default:
+  	surprise();
   }
+
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  status = VL53LX_GetMeasurementDataReady(Dev, &NewDataReady);
-	  			HAL_Delay(5);
-	  			if((!status)&&(NewDataReady!=0)){
-	  				status = VL53LX_GetMultiRangingData(Dev, pMultiRangingData);
-	  				no_of_object_found=pMultiRangingData->NumberOfObjectsFound;
-	  				printf("Count=%5d, ", pMultiRangingData->StreamCount);
-	  				printf("#Objs=%1d ", no_of_object_found);
-	  				for(j=0;j<no_of_object_found;j++){
-	  					if(j!=0)printf("\n                     ");
-	  					printf("status=%d, D=%5dmm, Signal=%2.2f Mcps, Ambient=%2.2f Mcps",
-	  							pMultiRangingData->RangeData[j].RangeStatus,
-	  							pMultiRangingData->RangeData[j].RangeMilliMeter,
-	  							pMultiRangingData->RangeData[j].SignalRateRtnMegaCps/65536.0,
-	  							pMultiRangingData->RangeData[j].AmbientRateRtnMegaCps/65536.0);
-	  				}
-	  				printf ("\n");
-	  				if (status==0){
-	  					status = VL53LX_ClearInterruptAndStartMeasurement(Dev);
-	  				}
-	  			}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -495,7 +481,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin|RS_DIR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LS_DIR_Pin RS_DIR_Pin */
   GPIO_InitStruct.Pin = LS_DIR_Pin|RS_DIR_Pin;
@@ -504,36 +490,42 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : MODE_B_Pin MODE_A_Pin */
+  GPIO_InitStruct.Pin = MODE_B_Pin|MODE_A_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_Pin */
+  GPIO_InitStruct.Pin = LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-static void MX_I2C1_Init(void)
-{
-
-	hi2c1.Instance = I2C1;
-	hi2c1.Init.ClockSpeed = 100000;
-	hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-	hi2c1.Init.OwnAddress1 = 0;
-	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-	hi2c1.Init.OwnAddress2 = 0;
-	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-	{
-		Error_Handler();
-	}
-
-}
+//static void MX_I2C1_Init(void)
+//{
+//
+//	hi2c1.Instance = I2C1;
+//	hi2c1.Init.ClockSpeed = 100000;
+//	hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+//	hi2c1.Init.OwnAddress1 = 0;
+//	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+//	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+//	hi2c1.Init.OwnAddress2 = 0;
+//	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+//	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+//	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+//	{
+//		Error_Handler();
+//	}
+//
+//}
 
 /* USER CODE END 4 */
 

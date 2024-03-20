@@ -1,0 +1,16 @@
+top level control - choose between routines how?
+ - physical switch(es)
+
+motor control
+- speed set 
+	- pwm how?
+- direction set
+- read encoders
+
+light sensor input
+- read values
+- understand values
+- PID
+
+servo control
+- also pwm??

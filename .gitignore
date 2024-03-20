@@ -1,0 +1,15 @@
+.metadata/.log
+.metadata/.plugins/org.eclipse.cdt.core/.log
+.metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.index
+.metadata/.plugins/org.eclipse.core.resources/.root/4.tree
+.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
+.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.ide.prefs
+.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.workbench.prefs
+.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
+.metadata/.plugins/org.eclipse.ui.ide/dialog_settings.xml
+.metadata/version.ini
+380_robot_code/.settings/language.settings.xml
+.metadata/.plugins/org.eclipse.core.resources/.projects/380_robot_code/2.tree
+.metadata/.plugins/org.eclipse.core.resources/.projects/VL53L4CX_Driver_Example/1.tree
+.metadata/.plugins/org.eclipse.core.resources/.projects/robot_2/2.tree
+.metadata/.plugins/org.eclipse.core.resources/.root/6.tree
