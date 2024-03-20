@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;380_robot_code/Drivers/BSP/Components/vl53l4cx/VL53L4CX&apos;" deleteContents="false" description="Delete resource &apos;380_robot_code/Drivers/BSP/Components/vl53l4cx/VL53L4CX&apos;" element1="/380_robot_code/Drivers/BSP/Components/vl53l4cx/VL53L4CX" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1709774777644"/>
+</session>

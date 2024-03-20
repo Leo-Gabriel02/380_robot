@@ -1,0 +1,146 @@
+20:27:46 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../TOF/Target -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:57:3: error: conflicting types for 'VL53LX_Dev_t'; have 'struct <anonymous>'
+   57 | } VL53LX_Dev_t;
+      |   ^~~~~~~~~~~~
+In file included from ../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform_user_data.h:22,
+                 from ../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform.h:20,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/vl53lx_api_core.h:18,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:15,
+                 from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/vl53l4cx.h:98:3: note: previous declaration of 'VL53LX_Dev_t' with type 'VL53LX_Dev_t'
+   98 | } VL53LX_Dev_t;
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:64:23: error: conflicting types for 'VL53LX_DEV'; have 'VL53LX_Dev_t *'
+   64 | typedef VL53LX_Dev_t* VL53LX_DEV;
+      |                       ^~~~~~~~~~
+In file included from ../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform.h:20,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/vl53lx_api_core.h:18,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:15,
+                 from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform_user_data.h:29:28: note: previous declaration of 'VL53LX_DEV' with type 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'}
+   29 | typedef VL53L4CX_Object_t* VL53LX_DEV;
+      |                            ^~~~~~~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:145:3: error: too few arguments to function 'VL53LX_WaitDeviceBooted'
+  145 |   VL53LX_WaitDeviceBooted();
+      |   ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:143:14: note: declared here
+  143 | VL53LX_Error VL53LX_WaitDeviceBooted(VL53LX_DEV Dev);
+      |              ^~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:146:3: error: too few arguments to function 'VL53LX_DataInit'
+  146 |   VL53LX_DataInit();
+      |   ^~~~~~~~~~~~~~~
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:133:14: note: declared here
+  133 | VL53LX_Error VL53LX_DataInit(VL53LX_DEV Dev);
+      |              ^~~~~~~~~~~~~~~
+../Core/Src/main.c:147:3: error: too few arguments to function 'VL53LX_SetCalibrationData'
+  147 |   VL53LX_SetCalibrationData();
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:649:14: note: declared here
+  649 | VL53LX_Error VL53LX_SetCalibrationData(VL53LX_DEV Dev,
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:150:17: warning: passing argument 1 of 'VL53LX_RdByte' from incompatible pointer type [-Wincompatible-pointer-types]
+  150 |   VL53LX_RdByte(Dev, 0x010F, &byteData);
+      |                 ^~~
+      |                 |
+      |                 VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Drivers/BSP/Components/vl53l4cx/modules/vl53lx_api_core.h:18,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:15,
+                 from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform.h:174:31: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  174 |                 VL53LX_DEV    Dev,
+      |                 ~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:152:17: warning: passing argument 1 of 'VL53LX_RdByte' from incompatible pointer type [-Wincompatible-pointer-types]
+  152 |   VL53LX_RdByte(Dev, 0x0110, &byteData);
+      |                 ^~~
+      |                 |
+      |                 VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Drivers/BSP/Components/vl53l4cx/modules/vl53lx_api_core.h:18,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:15,
+                 from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform.h:174:31: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  174 |                 VL53LX_DEV    Dev,
+      |                 ~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:154:17: warning: passing argument 1 of 'VL53LX_RdWord' from incompatible pointer type [-Wincompatible-pointer-types]
+  154 |   VL53LX_RdWord(Dev, 0x010F, &wordData);
+      |                 ^~~
+      |                 |
+      |                 VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Drivers/BSP/Components/vl53l4cx/modules/vl53lx_api_core.h:18,
+                 from ../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:15,
+                 from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/porting/vl53lx_platform.h:193:31: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  193 |                 VL53LX_DEV    Dev,
+      |                 ~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:158:36: warning: passing argument 1 of 'VL53LX_WaitDeviceBooted' from incompatible pointer type [-Wincompatible-pointer-types]
+  158 |   status = VL53LX_WaitDeviceBooted(Dev);
+      |                                    ^~~
+      |                                    |
+      |                                    VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:143:49: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  143 | VL53LX_Error VL53LX_WaitDeviceBooted(VL53LX_DEV Dev);
+      |                                      ~~~~~~~~~~~^~~
+../Core/Src/main.c:159:28: warning: passing argument 1 of 'VL53LX_DataInit' from incompatible pointer type [-Wincompatible-pointer-types]
+  159 |   status = VL53LX_DataInit(Dev);
+      |                            ^~~
+      |                            |
+      |                            VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:133:41: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  133 | VL53LX_Error VL53LX_DataInit(VL53LX_DEV Dev);
+      |                              ~~~~~~~~~~~^~~
+../Core/Src/main.c:160:36: warning: passing argument 1 of 'VL53LX_StartMeasurement' from incompatible pointer type [-Wincompatible-pointer-types]
+  160 |   status = VL53LX_StartMeasurement(Dev);
+      |                                    ^~~
+      |                                    |
+      |                                    VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:294:49: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  294 | VL53LX_Error VL53LX_StartMeasurement(VL53LX_DEV Dev);
+      |                                      ~~~~~~~~~~~^~~
+../Core/Src/main.c:171:51: warning: passing argument 1 of 'VL53LX_GetMeasurementDataReady' from incompatible pointer type [-Wincompatible-pointer-types]
+  171 |           status = VL53LX_GetMeasurementDataReady(Dev, &NewDataReady);
+      |                                                   ^~~
+      |                                                   |
+      |                                                   VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:337:56: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  337 | VL53LX_Error VL53LX_GetMeasurementDataReady(VL53LX_DEV Dev,
+      |                                             ~~~~~~~~~~~^~~
+../Core/Src/main.c:174:77: warning: passing argument 1 of 'VL53LX_GetMultiRangingData' from incompatible pointer type [-Wincompatible-pointer-types]
+  174 |                                         status = VL53LX_GetMultiRangingData(Dev, pMultiRangingData);
+      |                                                                             ^~~
+      |                                                                             |
+      |                                                                             VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:377:52: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  377 | VL53LX_Error VL53LX_GetMultiRangingData(VL53LX_DEV Dev,
+      |                                         ~~~~~~~~~~~^~~
+../Core/Src/main.c:188:99: warning: passing argument 1 of 'VL53LX_ClearInterruptAndStartMeasurement' from incompatible pointer type [-Wincompatible-pointer-types]
+  188 |                                                 status = VL53LX_ClearInterruptAndStartMeasurement(Dev);
+      |                                                                                                   ^~~
+      |                                                                                                   |
+      |                                                                                                   VL53LX_DEV {aka VL53LX_Dev_t *}
+In file included from ../Core/Src/main.c:25:
+../Drivers/BSP/Components/vl53l4cx/modules/VL53Lx_api.h:320:66: note: expected 'VL53LX_DEV' {aka 'VL53L4CX_Object_t *'} but argument is of type 'VL53LX_DEV' {aka 'VL53LX_Dev_t *'}
+  320 | VL53LX_Error VL53LX_ClearInterruptAndStartMeasurement(VL53LX_DEV Dev);
+      |                                                       ~~~~~~~~~~~^~~
+../Core/Src/main.c: In function 'MX_I2C1_Init':
+../Core/Src/main.c:430:19: error: 'I2C_InitTypeDef' has no member named 'ClockSpeed'
+  430 |         hi2c1.Init.ClockSpeed = 100000;
+      |                   ^
+../Core/Src/main.c:431:19: error: 'I2C_InitTypeDef' has no member named 'DutyCycle'
+  431 |         hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+      |                   ^
+../Core/Src/main.c:431:32: error: 'I2C_DUTYCYCLE_2' undeclared (first use in this function)
+  431 |         hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+      |                                ^~~~~~~~~~~~~~~
+../Core/Src/main.c:431:32: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Core/Src/subdir.mk:37: Core/Src/main.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
