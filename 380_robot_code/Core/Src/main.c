@@ -91,21 +91,15 @@ const double M_SCALE[4] = {1,1,1,1};
 void driveFast() {
 	char b[] = "Driving fast!\r\n";
 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_SET);
 
-
-//	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, TIM1->ARR/2);
-
-	while(1) {
-		char b [100];
-
-		sprintf(b, "mode a %d\r\n", TIM1->CNT);
-	 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+	while (1) {
+		runMotors(LEFT, FWD, 0.9);
+		runMotors(RIGHT, FWD, 0.9);
+		HAL_Delay(3000);
+		runMotors(LEFT, BWD, 0.9);
+		runMotors(RIGHT, BWD, 0.9);
+		HAL_Delay(3000);
 	}
-
-//		runMotors(LEFT, BWD, 1);
-//		runMotors(RIGHT, FWD, 1);
 }
 
 void lineFollow() {
@@ -145,15 +139,23 @@ void surprise() {
 }
 
 void runMotors(uint8_t side, uint8_t dir, double duty) {
-	uint16_t duty_adj = dir == FWD ? (1-duty) : duty;
+	double duty_adj = dir == FWD ? (1-duty) : duty;
 
-	setBit(M_DIR[side], dir);
+	char b [100];
+	sprintf(b, "duty %f\r\n", duty);
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+	sprintf(b, "duty_adj %f\r\n", duty_adj);
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+	//setBit(M_DIR[side], dir);
 
 	if (side == RIGHT) {
+		HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
 		TIM1->CCR1 = duty_adj*TIM1->ARR;
-		TIM1->CCR2 = duty_adj*TIM1->ARR;
+		//TIM1->CCR2 = duty_adj*TIM1->ARR;
 	} else {
-		TIM1->CCR3 = duty_adj*TIM1->ARR;
+		HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
+		//TIM1->CCR3 = duty_adj*TIM1->ARR;
 		TIM1->CCR4 = duty_adj*TIM1->ARR;
 	}
 }
@@ -214,8 +216,19 @@ int main(void)
 
   HAL_Delay(700);
 
-  TIM1->CCR4 = 30;
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+
+  // Make sure all motors are stopped
+  TIM1->CCR1 = 0;
+  TIM1->CCR2 = 0;
+  TIM1->CCR3 = 0;
+  TIM1->CCR4 = 0;
+
+  HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_RESET);
 
   uint16_t mode_a = (MODE_A_GPIO_Port->IDR & MODE_A_Pin) > 0;
   uint16_t mode_b = (MODE_B_GPIO_Port->IDR & MODE_B_Pin) > 0;
@@ -236,13 +249,13 @@ int main(void)
   	driveFast();
   	break;
   case 1:
-  	lineFollow();
+  	driveFast();
   	break;
   case 2:
-  	shoot();
+  	driveFast();
   	break;
   default:
-  	surprise();
+  	driveFast();
   	break;
   }
 
