@@ -72,6 +72,9 @@ static void MX_TIM2_Init(void);
 #define FWD 1
 #define BWD 0
 
+#define LEFT 1
+#define RIGHT 0
+
 enum motors {
 	LSM1,
 	LSM2,
@@ -79,20 +82,51 @@ enum motors {
 	RSM2
 };
 
-const uint8_t M_PINS[4] = {LS_M1_Pin, LS_M2_Pin, RS_M1_Pin, RS_M2_Pin};
+//const uint16_t M_PINS[4] = {LS_M1_Pin, LS_M2_Pin, RS_M1_Pin, RS_M2_Pin};
+volatile const uint32_t *M_CCR[4] = {&(TIM1->CCR1), &(TIM1->CCR2), &(TIM1->CCR3), &(TIM1->CCR4)};
+const uint8_t M_DIR[2] = {LS_DIR_Pin, RS_DIR_Pin};
 const double M_SCALE[4] = {1,1,1,1};
 
 
 void driveFast() {
 	char b[] = "Driving fast!\r\n";
 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-	runMotor(LSM1, FWD, 0xFFFF);
+	HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_SET);
+
+
+//	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, TIM1->ARR/2);
+
+	while(1) {
+		char b [100];
+
+		sprintf(b, "mode a %d\r\n", TIM1->CNT);
+	 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+	}
+
+//		runMotors(LEFT, BWD, 1);
+//		runMotors(RIGHT, FWD, 1);
 }
 
 void lineFollow() {
 	char b[] = "Following the line?\r\n";
 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
+	const uint32_t THRESHOLD = 7000;
+	uint32_t reading = 1000; //make real input
+
+	runMotors(LEFT, FWD, 1);
+	runMotors(RIGHT, FWD, 1);
+
+	while (1) {
+		if (reading > THRESHOLD) {
+			runMotors(LEFT, FWD, 0.8);
+			runMotors(RIGHT, FWD, 1);
+		} else if (reading < THRESHOLD) {
+			runMotors(LEFT, FWD, 1);
+			runMotors(RIGHT, FWD, 0.8);
+		}
+	}
 }
 
 void shoot() {
@@ -110,8 +144,27 @@ void surprise() {
 	}
 }
 
-void runMotor(uint8_t motor, uint8_t dir, uint16_t rpm) {
+void runMotors(uint8_t side, uint8_t dir, double duty) {
+	uint16_t duty_adj = dir == FWD ? (1-duty) : duty;
 
+	setBit(M_DIR[side], dir);
+
+	if (side == RIGHT) {
+		TIM1->CCR1 = duty_adj*TIM1->ARR;
+		TIM1->CCR2 = duty_adj*TIM1->ARR;
+	} else {
+		TIM1->CCR3 = duty_adj*TIM1->ARR;
+		TIM1->CCR4 = duty_adj*TIM1->ARR;
+	}
+}
+
+
+void setBit(uint32_t bitMask, uint8_t value) {
+	if (value) {
+		GPIOA->ODR |= bitMask;
+	} else {
+		GPIOA->ODR &= ~bitMask;
+	}
 }
 
 
@@ -124,10 +177,9 @@ void runMotor(uint8_t motor, uint8_t dir, uint16_t rpm) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint16_t mode_a = MODE_A_GPIO_Port->IDR & MODE_A_Pin;
-	uint16_t mode_b = MODE_B_GPIO_Port->IDR & MODE_B_Pin;
 
-	uint8_t mode = mode_a | mode_b<<1;
+
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -155,16 +207,43 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   //MX_I2C1_Init();
+//  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+//  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+//  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+
+
+  HAL_Delay(700);
+
+  TIM1->CCR4 = 30;
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+
+  uint16_t mode_a = (MODE_A_GPIO_Port->IDR & MODE_A_Pin) > 0;
+  uint16_t mode_b = (MODE_B_GPIO_Port->IDR & MODE_B_Pin) > 0;
+
+  uint8_t mode = mode_a | mode_b<<1;
+
+  char b [100];
+
+ 	sprintf(b, "mode a %d\r\n", mode_a);
+ 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+ 	sprintf(b, "mode b %d\r\n", mode_b);
+ 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+ 	sprintf(b, "mode %d\r\n", mode);
+ 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   switch (mode) {
   case 0:
   	driveFast();
+  	break;
   case 1:
   	lineFollow();
+  	break;
   case 2:
   	shoot();
+  	break;
   default:
   	surprise();
+  	break;
   }
 
 
@@ -194,7 +273,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST);
+  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -204,8 +283,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
-  RCC_OscInitStruct.PLL.PLLN = 85;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
+  RCC_OscInitStruct.PLL.PLLN = 9;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -221,9 +300,9 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -250,7 +329,7 @@ static void MX_ADC2_Init(void)
   /** Common config
   */
   hadc2.Instance = ADC2;
-  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc2.Init.Resolution = ADC_RESOLUTION_12B;
   hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc2.Init.GainCompensation = 0;
@@ -309,9 +388,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
+  htim1.Init.Prescaler = 72-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 65535;
+  htim1.Init.Period = 99;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -543,6 +622,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -562,7 +642,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : MODE_B_Pin MODE_A_Pin */
   GPIO_InitStruct.Pin = MODE_B_Pin|MODE_A_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Pin */

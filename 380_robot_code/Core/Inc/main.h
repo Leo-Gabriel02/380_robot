@@ -95,6 +95,8 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+void runMotors(uint8_t side, uint8_t dir, double duty);
+void setBit(uint32_t bitMask, uint8_t value);
 
 /* USER CODE END Private defines */
 
