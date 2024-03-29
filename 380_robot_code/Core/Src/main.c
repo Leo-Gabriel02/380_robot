@@ -187,10 +187,8 @@ uint16_t readSensor(uint8_t sensor) {
 
 	uint16_t val2 = r*1000 / (r + g + b) * 3;
 
-	sprintf(out, "sensor %d  red/avg %d\r\n", sensor, val2);
-	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
-
-	HAL_Delay(500);
+//	sprintf(out, "sensor %d  red/avg %d\r\n", sensor, val2);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
 	return val2;
 
@@ -299,57 +297,8 @@ const double AVG_DUTY = (MIN_DUTY + MAX_DUTY)/2.0;
 const double DUTY_RANGE = AVG_DUTY - MIN_DUTY;
 
 const double kp = 2;
-const double ki = 100;
 
-void lineFollowAbsolute(uint16_t TAPE, uint16_t WOOD, int32_t* sumError_l, int32_t* sumError_r) {
-	char b [100];
 
-	uint16_t TARGET = (TAPE+WOOD)/2;
-	uint16_t READING_RANGE = TARGET - WOOD;
-
-//	sprintf(b, "reading range %d duty range %f\r\n", READING_RANGE, DUTY_RANGE);
-//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
-	uint16_t right = readSensor(SENSORS[1]);
-	uint16_t left = readSensor(SENSORS[2]);
-
-	int16_t error_r = right - TARGET;
-	int16_t error_l = left - TARGET;
-
-//	sprintf(b, "left error %d right error %d\r\n", error_l, error_r);
-//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
-	if (abs(error_r) < READING_RANGE*0.3) {
-		*sumError_r = 0;
-	} else {
-		*sumError_r += error_r;
-	}
-	if (abs(error_l) < READING_RANGE*0.3) {
-		*sumError_l = 0;
-	} else {
-		*sumError_l += error_l;
-	}
-
-	double delta_r = (kp * error_r + ki * (*sumError_r)) / READING_RANGE * DUTY_RANGE;
-	double delta_l = (kp * error_l + ki * (*sumError_l)) / READING_RANGE * DUTY_RANGE;
-
-	double duty_r = AVG_DUTY - delta_r;
-	double duty_l = AVG_DUTY - delta_l;
-
-//	sprintf(b, "delta_r %f duty_r %f\r\n", delta_r, duty_r);
-//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-  if (duty_l < MIN_DUTY) duty_l = MIN_DUTY;
-  if (duty_l > MAX_DUTY) duty_l = MAX_DUTY;
-  if (duty_r < MIN_DUTY) duty_r = MIN_DUTY;
-  if (duty_r > MAX_DUTY) duty_r = MAX_DUTY;
-
-//	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
-//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
-	runMotors(RIGHT, FWD, duty_r);
-	runMotors(LEFT, FWD, duty_l);
-
-}
 
 
 /* USER CODE END 0 */
@@ -423,11 +372,10 @@ int main(void)
 
   calibrate(&tape_val, &wood_val);
 
-  int32_t sumError_l = 0;
-  int32_t sumError_r = 0;
-
-
-
+  uint8_t turn_r = 0;
+  uint8_t turn_l = 0;
+  double turn_adj = 0;
+  double TURN_INC = 0.003;
 
   /* USER CODE END 2 */
 
@@ -435,7 +383,70 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    lineFollowAbsolute(tape_val, wood_val, &sumError_l, &sumError_r);
+  	char b [100];
+
+  	uint16_t TARGET = (tape_val+wood_val)/2;
+  	uint16_t READING_RANGE = TARGET - wood_val;
+
+  	uint16_t right = readSensor(SENSORS[1]);
+  	uint16_t left = readSensor(SENSORS[2]);
+
+  	int16_t error_r = right - TARGET;
+  	int16_t error_l = left - TARGET;
+
+  	if (abs(readSensor(SENSORS[0]) - tape_val) <= tape_val*0.05) {
+  		turn_r = 1;
+  	} else if (error_l > 0) {
+  		turn_r = 0;
+  		turn_adj = 0;
+  	}
+  	if (abs(readSensor(SENSORS[3]) - tape_val) <= tape_val*0.05) {
+  		turn_l = 1;
+  	} else if (error_r > 0) {
+  		turn_l = 0;
+  		turn_adj = 0;
+  	}
+
+  	if (turn_r && turn_l) {
+  		turn_r = 0;
+  		turn_l = 0;
+  		turn_adj = 0;
+  	} else if (turn_r) {
+  		runMotors(LEFT, FWD, 1);
+  		runMotors(RIGHT, FWD, turn_adj);
+  		turn_adj += TURN_INC;
+  		continue;
+  	} else if (turn_l) {
+  		runMotors(LEFT, FWD, turn_adj);
+  		runMotors(RIGHT, FWD, 1);
+  		turn_adj += TURN_INC;
+  		continue;
+  	} else {
+  		turn_adj = 0;
+  	}
+
+//  	sprintf(b, "left turn %d right turn %d\r\n", turn_l, turn_r);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+  	double delta_r = kp * error_r  / READING_RANGE * DUTY_RANGE;
+  	double delta_l = kp * error_l  / READING_RANGE * DUTY_RANGE;
+
+  	double duty_r = AVG_DUTY - delta_r;
+  	double duty_l = AVG_DUTY - delta_l;
+
+  //	sprintf(b, "delta_r %f duty_r %f\r\n", delta_r, duty_r);
+  //	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+    if (duty_l < MIN_DUTY) duty_l = MIN_DUTY;
+    if (duty_l > MAX_DUTY) duty_l = MAX_DUTY;
+    if (duty_r < MIN_DUTY) duty_r = MIN_DUTY;
+    if (duty_r > MAX_DUTY) duty_r = MAX_DUTY;
+
+//  	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+  	runMotors(RIGHT, FWD, duty_r);
+  	runMotors(LEFT, FWD, duty_l);
+
 
     /* USER CODE END WHILE */
 
