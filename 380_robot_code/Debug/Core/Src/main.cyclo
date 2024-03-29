@@ -4,7 +4,7 @@
 ../Core/Src/main.c:157:10:readSensor	4
 ../Core/Src/main.c:198:6:initSensors	4
 ../Core/Src/main.c:223:6:calibrate	7
-../Core/Src/main.c:310:5:main	13
+../Core/Src/main.c:310:5:main	15
 ../Core/Src/main.c:462:6:SystemClock_Config	3
 ../Core/Src/main.c:509:13:MX_ADC2_Init	3
 ../Core/Src/main.c:568:13:MX_I2C1_Init	4

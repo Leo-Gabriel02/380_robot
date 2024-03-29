@@ -412,13 +412,13 @@ int main(void)
   		turn_l = 0;
   		turn_adj = 0;
   	} else if (turn_r) {
-  		runMotors(LEFT, FWD, 1);
-  		runMotors(RIGHT, FWD, turn_adj);
+  		runMotors(LEFT, FWD, 0.6);
+  		runMotors(RIGHT, BWD, 0.4 - turn_adj > 0 ? 0.4 - turn_adj : 0);
   		turn_adj += TURN_INC;
   		continue;
   	} else if (turn_l) {
-  		runMotors(LEFT, FWD, turn_adj);
-  		runMotors(RIGHT, FWD, 1);
+  		runMotors(LEFT, BWD, 0.4 - turn_adj > 0 ? 0.4 - turn_adj : 0);
+  		runMotors(RIGHT, FWD, 0.6);
   		turn_adj += TURN_INC;
   		continue;
   	} else {
