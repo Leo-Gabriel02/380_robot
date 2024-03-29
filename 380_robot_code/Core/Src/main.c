@@ -44,6 +44,8 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc2;
 
+I2C_HandleTypeDef hi2c1;
+
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
@@ -62,6 +64,7 @@ static void MX_TIM1_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 //static void MX_I2C1_Init(void);
 
@@ -69,11 +72,15 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define FWD 1
-#define BWD 0
+#define FWD 0
+#define BWD 1
 
-#define LEFT 1
-#define RIGHT 0
+#define LEFT 0
+#define RIGHT 1
+
+#define MUX_ADDR 0x70 << 1
+#define SENSOR_ADDR 0x10 << 1
+#define I2C_CMD_REG 0x00
 
 enum motors {
 	LSM1,
@@ -87,75 +94,29 @@ volatile const uint32_t *M_CCR[4] = {&(TIM1->CCR1), &(TIM1->CCR2), &(TIM1->CCR3)
 const uint8_t M_DIR[2] = {LS_DIR_Pin, RS_DIR_Pin};
 const double M_SCALE[4] = {1,1,1,1};
 
+const uint8_t SENSOR_REGS[3] = {0x05, 0x06, 0x07};
+const uint8_t SENSORS[4] = {2, 3, 4, 5};
+uint8_t NUM_SENSORS = sizeof(SENSORS)/sizeof(SENSORS[0]);
 
-void driveFast() {
-	char b[] = "Driving fast!\r\n";
-	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
-	while (1) {
-		runMotors(LEFT, FWD, 0.9);
-		runMotors(RIGHT, FWD, 0.9);
-		HAL_Delay(3000);
-		runMotors(LEFT, BWD, 0.9);
-		runMotors(RIGHT, BWD, 0.9);
-		HAL_Delay(3000);
-	}
-}
-
-void lineFollow() {
-	char b[] = "Following the line?\r\n";
-	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
-	const uint32_t THRESHOLD = 7000;
-	uint32_t reading = 1000; //make real input
-
-	runMotors(LEFT, FWD, 1);
-	runMotors(RIGHT, FWD, 1);
-
-	while (1) {
-		if (reading > THRESHOLD) {
-			runMotors(LEFT, FWD, 0.8);
-			runMotors(RIGHT, FWD, 1);
-		} else if (reading < THRESHOLD) {
-			runMotors(LEFT, FWD, 1);
-			runMotors(RIGHT, FWD, 0.8);
-		}
-	}
-}
-
-void shoot() {
-	char b[] = "goodbye mr lego man\r\n";
-	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-}
-
-void surprise() {
-	char b[] = "surprise :0\r\n";
-	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
-	while (1) {
-		HAL_GPIO_TogglePin (LED_GPIO_Port, LED_Pin);
-		HAL_Delay (100);
-	}
-}
 
 void runMotors(uint8_t side, uint8_t dir, double duty) {
-	double duty_adj = dir == FWD ? (1-duty) : duty;
+	double duty_adj = dir == BWD ? (1-duty) : duty;
 
-	char b [100];
-	sprintf(b, "duty %f\r\n", duty);
-	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-	sprintf(b, "duty_adj %f\r\n", duty_adj);
-	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//	char b [100];
+//	sprintf(b, "duty %f\r\n", duty);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//	sprintf(b, "duty_adj %f\r\n", duty_adj);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
 	//setBit(M_DIR[side], dir);
 
-	if (side == RIGHT) {
-		HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	if (side == LEFT) {
+		HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == BWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
 		TIM1->CCR1 = duty_adj*TIM1->ARR;
-		//TIM1->CCR2 = duty_adj*TIM1->ARR;
+		TIM1->CCR2 = duty_adj*TIM1->ARR;
 	} else {
-		HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-		//TIM1->CCR3 = duty_adj*TIM1->ARR;
+		HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == BWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
+		TIM1->CCR3 = duty_adj*TIM1->ARR;
 		TIM1->CCR4 = duty_adj*TIM1->ARR;
 	}
 }
@@ -167,6 +128,227 @@ void setBit(uint32_t bitMask, uint8_t value) {
 	} else {
 		GPIOA->ODR &= ~bitMask;
 	}
+}
+
+uint8_t selectMuxAddr(uint8_t sensor) {
+  HAL_StatusTypeDef ret;
+  char b [100];
+
+  if (sensor > 7) {
+ 		sprintf(b, "sensor index %d out of bounds\r\n", sensor);
+ 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+  }
+
+  uint8_t data[1] = {1 << sensor};
+
+  ret = HAL_I2C_Master_Transmit(&hi2c1, MUX_ADDR, data, 1, HAL_MAX_DELAY);
+
+  if ( ret != HAL_OK ) {
+ 		sprintf(b, "failed to connect to sensor %d - error code %d\r\n", sensor, ret);
+ 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+ 		return 0;
+ 	} else {
+// 		sprintf(b, "connected to sensor %d\r\n", sensor);
+// 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+ 		return 1;
+ 	}
+}
+
+uint16_t readSensor(uint8_t sensor) {
+	if (!selectMuxAddr(sensor)) {
+		return 0;
+	}
+
+  HAL_StatusTypeDef ret;
+  uint8_t buf16[2];
+  char out [100];
+  uint16_t val;
+  uint16_t rgb[3];
+
+	for (int i = 0; i < 3; i++) {
+    ret = HAL_I2C_Mem_Read(&hi2c1, SENSOR_ADDR, SENSOR_REGS[i], I2C_MEMADD_SIZE_8BIT, buf16, 2, HAL_MAX_DELAY);
+
+    if ( ret != HAL_OK ) {
+   		sprintf(out, "sensor read %d failed with error code %d\r\n", sensor, ret);
+   		HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+   	} else {
+      val = buf16[1] << 8 | buf16[0];
+
+//   		sprintf(b, "%d %d %d\r\n", buf16[1], buf16[0], val);
+//   		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+   		rgb[i] = val;
+   	}
+	}
+
+	uint16_t r = rgb[0];
+	uint16_t g = rgb[1];
+	uint16_t b = rgb[2];
+
+	uint16_t val2 = r*1000 / (r + g + b) * 3;
+
+	sprintf(out, "sensor %d  red/avg %d\r\n", sensor, val2);
+	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+
+	HAL_Delay(500);
+
+	return val2;
+
+
+}
+
+void initSensors() {
+  HAL_StatusTypeDef ret;
+  uint8_t buf16[2];
+  char b [100];
+
+  buf16[0] = 0;
+  buf16[1] = 1 << (11-8);
+
+	for (int i = 0; i < sizeof(SENSORS)/sizeof(SENSORS[0]); i++) {
+		if (!selectMuxAddr(SENSORS[i])) {
+				continue;
+		}
+
+	  ret = HAL_I2C_Mem_Write(&hi2c1, SENSOR_ADDR, I2C_CMD_REG, I2C_MEMADD_SIZE_8BIT, buf16, 2, HAL_MAX_DELAY);
+
+	  if ( ret != HAL_OK ) {
+			sprintf(b, "fail %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+		} else {
+			sprintf(b, "success %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+		}
+	}
+}
+
+void calibrate(uint16_t* tape_val, uint16_t* wood_val) {
+  char b [100];
+	uint16_t tape = 0;
+	uint16_t wood = 0;
+
+	uint32_t wood_sum = 0;
+	uint32_t tape_sum = 0;
+	uint16_t avg_reading = 0;
+
+	runMotors(LEFT, FWD, 0.4);
+	runMotors(RIGHT, FWD, 0.4);
+
+	uint16_t count = 1;
+	uint16_t tape_count = 0;
+
+	for (int i = 0; i < NUM_SENSORS; i++) {
+		wood_sum += readSensor(SENSORS[i]);
+	}
+	wood_sum /= NUM_SENSORS;
+	wood = wood_sum;
+
+	sprintf(b, "wood %d\r\n", wood);
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+	while (1) {
+		count++;
+		avg_reading = 0;
+
+		for (int i = 0; i < NUM_SENSORS; i++) {
+			avg_reading += readSensor(SENSORS[i]);
+		}
+		avg_reading /= NUM_SENSORS;
+
+		if (abs(avg_reading - wood) <= wood*0.3) {
+
+			wood_sum += avg_reading;
+			wood = wood_sum / count;
+
+			sprintf(b, "wood %d\r\n", wood);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+			if (tape_count > 0) {
+				tape_count = 0;
+				tape_sum = 0;
+			}
+		} else {
+			sprintf(b, "tape? \r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+			tape_count++;
+			if (tape_count > 3) {
+				tape_sum += avg_reading;
+			}
+		}
+
+		if (tape_count >= 5) {
+			tape = tape_sum / (tape_count-3);
+
+			sprintf(b, "found tape! %d\r\n", tape);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+			break;
+		}
+	}
+
+
+	*tape_val = tape;
+	*wood_val = wood;
+//	runMotors(LEFT, FWD, 0);
+//	runMotors(RIGHT, FWD, 0);
+}
+
+const double MAX_DUTY = 0.8;
+const double MIN_DUTY = 0.4;
+const double AVG_DUTY = (MIN_DUTY + MAX_DUTY)/2.0;
+const double DUTY_RANGE = AVG_DUTY - MIN_DUTY;
+
+const double kp = 2;
+const double ki = 100;
+
+void lineFollowAbsolute(uint16_t TAPE, uint16_t WOOD, int32_t* sumError_l, int32_t* sumError_r) {
+	char b [100];
+
+	uint16_t TARGET = (TAPE+WOOD)/2;
+	uint16_t READING_RANGE = TARGET - WOOD;
+
+//	sprintf(b, "reading range %d duty range %f\r\n", READING_RANGE, DUTY_RANGE);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+	uint16_t right = readSensor(SENSORS[1]);
+	uint16_t left = readSensor(SENSORS[2]);
+
+	int16_t error_r = right - TARGET;
+	int16_t error_l = left - TARGET;
+
+//	sprintf(b, "left error %d right error %d\r\n", error_l, error_r);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+	if (abs(error_r) < READING_RANGE*0.3) {
+		*sumError_r = 0;
+	} else {
+		*sumError_r += error_r;
+	}
+	if (abs(error_l) < READING_RANGE*0.3) {
+		*sumError_l = 0;
+	} else {
+		*sumError_l += error_l;
+	}
+
+	double delta_r = (kp * error_r + ki * (*sumError_r)) / READING_RANGE * DUTY_RANGE;
+	double delta_l = (kp * error_l + ki * (*sumError_l)) / READING_RANGE * DUTY_RANGE;
+
+	double duty_r = AVG_DUTY - delta_r;
+	double duty_l = AVG_DUTY - delta_l;
+
+//	sprintf(b, "delta_r %f duty_r %f\r\n", delta_r, duty_r);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+  if (duty_l < MIN_DUTY) duty_l = MIN_DUTY;
+  if (duty_l > MAX_DUTY) duty_l = MAX_DUTY;
+  if (duty_r < MIN_DUTY) duty_r = MIN_DUTY;
+  if (duty_r > MAX_DUTY) duty_r = MAX_DUTY;
+
+//	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+	runMotors(RIGHT, FWD, duty_r);
+	runMotors(LEFT, FWD, duty_l);
+
 }
 
 
@@ -207,6 +389,7 @@ int main(void)
   MX_ADC2_Init();
   MX_TIM3_Init();
   MX_TIM2_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   //MX_I2C1_Init();
 //  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
@@ -230,34 +413,19 @@ int main(void)
   HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_RESET);
 
-  uint16_t mode_a = (MODE_A_GPIO_Port->IDR & MODE_A_Pin) > 0;
-  uint16_t mode_b = (MODE_B_GPIO_Port->IDR & MODE_B_Pin) > 0;
+  initSensors();
 
-  uint8_t mode = mode_a | mode_b<<1;
 
-  char b [100];
+  uint16_t tape_val;
+  uint16_t wood_val;
 
- 	sprintf(b, "mode a %d\r\n", mode_a);
- 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
- 	sprintf(b, "mode b %d\r\n", mode_b);
- 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
- 	sprintf(b, "mode %d\r\n", mode);
- 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+  HAL_Delay(100);
 
-  switch (mode) {
-  case 0:
-  	driveFast();
-  	break;
-  case 1:
-  	driveFast();
-  	break;
-  case 2:
-  	driveFast();
-  	break;
-  default:
-  	driveFast();
-  	break;
-  }
+  calibrate(&tape_val, &wood_val);
+
+  int32_t sumError_l = 0;
+  int32_t sumError_r = 0;
+
 
 
 
@@ -267,6 +435,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    lineFollowAbsolute(tape_val, wood_val, &sumError_l, &sumError_r);
 
     /* USER CODE END WHILE */
 
@@ -377,6 +546,54 @@ static void MX_ADC2_Init(void)
   /* USER CODE BEGIN ADC2_Init 2 */
 
   /* USER CODE END ADC2_Init 2 */
+
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x10808DD3;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
 
 }
 
@@ -651,12 +868,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : MODE_B_Pin MODE_A_Pin */
-  GPIO_InitStruct.Pin = MODE_B_Pin|MODE_A_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
