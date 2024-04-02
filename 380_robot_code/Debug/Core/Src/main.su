@@ -1,10 +1,10 @@
 ../Core/Src/main.c:104:6:runMotors	40	static
-../Core/Src/main.c:125:6:setBit	16	static
-../Core/Src/main.c:133:9:selectMuxAddr	136	static
-../Core/Src/main.c:157:10:readSensor	160	static
-../Core/Src/main.c:198:6:initSensors	136	static
-../Core/Src/main.c:258:6:calibrate	160	static
-../Core/Src/main.c:346:5:main	192	static
+../Core/Src/main.c:128:6:setBit	16	static
+../Core/Src/main.c:136:9:selectMuxAddr	136	static
+../Core/Src/main.c:160:10:readSensor	160	static
+../Core/Src/main.c:201:6:initSensors	136	static
+../Core/Src/main.c:261:6:calibrate	160	static
+../Core/Src/main.c:348:5:main	176	static
 ../Core/Src/main.c:486:6:SystemClock_Config	88	static
 ../Core/Src/main.c:533:13:MX_ADC2_Init	40	static
 ../Core/Src/main.c:592:13:MX_I2C1_Init	8	static

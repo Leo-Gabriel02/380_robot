@@ -1,10 +1,18 @@
-21:21:07 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j12 all 
+02:50:06 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
 arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
    text	   data	    bss	    dec	    hex	filename
-  36904	    476	   2388	  39768	   9b58	380_robot_code.elf
+  45012	    480	   2472	  47964	   bb5c	380_robot_code.elf
 Finished building: default.size.stdout
  
+Finished building: 380_robot_code.list
+ 
 
-21:21:08 Build Finished. 0 errors, 0 warnings. (took 596ms)
+02:50:09 Build Finished. 0 errors, 1 warnings. (took 2s.197ms)
 
