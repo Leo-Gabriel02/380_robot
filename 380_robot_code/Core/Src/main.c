@@ -80,6 +80,9 @@ static void MX_I2C1_Init(void);
 
 #define MUX_ADDR 0x70 << 1
 #define TCS_ADDR 0x29 << 1
+#define ICM_ADDR 0x69 << 1
+#define MAG_ADDR 0x0C << 1
+
 #define EN_REG 0x80 | 0x00
 #define INT_REG 0x80 | 0x01
 #define GAIN_REG 0x80 | 0x0F
@@ -114,8 +117,8 @@ void runMotors(uint8_t side, uint8_t dir, double duty) {
 
     double duty_adj = dir == FWD ? (1-duty) : duty;
 
-    sprintf(b, "duty %f fwd? %d \r\n", duty_adj, dir == FWD);
-    HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//    sprintf(b, "duty %f fwd? %d \r\n", duty_adj, dir == FWD);
+//    HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
     if (side == LEFT) {
         HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
@@ -260,6 +263,112 @@ void initSensors() {
 	  HAL_Delay(300);
 
 	}
+}
+
+void initIMU() {
+  HAL_Delay(500);
+
+	HAL_StatusTypeDef ret;
+	uint8_t buf8;
+	char out [100];
+
+	if (!selectMuxAddr(6)) return;
+
+	// write bypass
+	buf8 = 1 << 1;
+  ret = HAL_I2C_Mem_Write(&hi2c1, ICM_ADDR, 0x0F, I2C_MEMADD_SIZE_8BIT, &buf8, 1, HAL_MAX_DELAY);
+
+  if ( ret != HAL_OK ) {
+  	sprintf(out, "fail %d\r\n", ret);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  	return;
+  } else {
+  	sprintf(out, "success %d\r\n", buf8);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  }
+
+	// write sleep
+	buf8 = 0x01;
+  ret = HAL_I2C_Mem_Write(&hi2c1, ICM_ADDR, 0x06, I2C_MEMADD_SIZE_8BIT, &buf8, 1, HAL_MAX_DELAY);
+
+  if ( ret != HAL_OK ) {
+  	sprintf(out, "fail %d\r\n", ret);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  	return;
+  } else {
+  	sprintf(out, "success %d\r\n", buf8);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  }
+
+  HAL_Delay(10);
+
+  // enable magnetometer at 100 Hz
+  buf8 = 0b01000;
+  ret = HAL_I2C_Mem_Write(&hi2c1, MAG_ADDR, 0x31, I2C_MEMADD_SIZE_8BIT, &buf8, 1, HAL_MAX_DELAY);
+
+  if ( ret != HAL_OK ) {
+  	sprintf(out, "fail %d\r\n", ret);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  	return;
+  } else {
+  	sprintf(out, "success %d\r\n", buf8);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  }
+
+}
+
+void readIMURaw(int16_t* x, int16_t* y, int16_t* z) {
+	if (!selectMuxAddr(6)) return;
+
+	HAL_StatusTypeDef ret;
+	uint8_t data[6];
+	char out [100];
+	uint8_t buf8;
+
+	// read magnetometer
+  ret = HAL_I2C_Mem_Read(&hi2c1, MAG_ADDR, 0x11, I2C_MEMADD_SIZE_8BIT, data, 6, HAL_MAX_DELAY);
+
+  if ( ret != HAL_OK ) {
+  	sprintf(out, "IMU read failed fail %d\r\n", ret);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  } else {
+//    	sprintf(out, "x %d %d y %d %d z %d %d\r\n", data[1], data[0], data[3], data[2], data[5], data[4]);
+//    	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+
+  	*x = data[1] << 8 | data[0];
+  	*y = data[3] << 8 | data[2];
+  	*z = data[5] << 8 | data[4];
+
+  	sprintf(out, "x %d y %d z %d \r\n", *x, *y, *z);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  }
+
+
+  // have to read this register afterwards to clear data ready bit
+  ret = HAL_I2C_Mem_Read(&hi2c1, MAG_ADDR, 0x18, I2C_MEMADD_SIZE_8BIT, &buf8, 1, HAL_MAX_DELAY);
+  if ( ret != HAL_OK ) {
+  	sprintf(out, "IMU read clear failed %d\r\n", ret);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  } else {
+//    	sprintf(out, "success %d %d\r\n", buf16[1], buf16[0]);
+//    	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  }
+}
+
+double getAngle(double theta0) {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+
+	readIMURaw(&x, &y, &z);
+
+	double theta = atan2(z+200, y-25);
+	theta = theta * 360 / (2 * M_PI);
+	if (theta < 0) {
+		theta += 360;
+	}
+
+	return theta - theta0;
 }
 
 void autoCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
@@ -427,7 +536,7 @@ const double AVG_DUTY = 0.4;
 const double DUTY_RANGE = 0.4;
 
 const double kp = 0.8;
-const double kd = 1;
+const double kd = 1.2;
 
 
 
@@ -499,12 +608,15 @@ int main(void)
   HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   initSensors();
+  initIMU();
 
 
   uint16_t tape_val;
   uint16_t wood_val;
 
   HAL_Delay(100);
+
+  double theta0 = getAngle(0);
 
 
   midCalibrate(&tape_val, &wood_val);
@@ -535,8 +647,8 @@ int main(void)
   	uint16_t right = readSensor(SENSORS[1]);
   	uint16_t left = readSensor(SENSORS[2]);
 
-  	sprintf(b, "left sensor %d right sensor %d\r\n", right, left);
-  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//  	sprintf(b, "left sensor %d right sensor %d\r\n", right, left);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   	int16_t error_r = right - TARGET;
   	int16_t error_l = left - TARGET;
@@ -547,43 +659,44 @@ int main(void)
   	double duty_r;//MIN_DUTY + ratio/(tape/wood)*(MAX_DUTY-MIN_DUTY);//
   	double duty_l;//MIN_DUTY + (1/ratio)/(tape/wood)*(MAX_DUTY-MIN_DUTY); //
 
+  	if (left < wood_val*1.1 && right < wood_val*1.1) {
+    	prev_r = error_r;
+    	prev_l = error_l;
+  		continue;
+  	}
+
   	if (left < wood_val*1.1 && right < 0.5*(tape_val-wood_val) + wood_val) {
   		turn_count_r ++;
   		turn_count_l = 0;
-
   	} else if (right < wood_val*1.1 && left < 0.5*(tape_val-wood_val) + wood_val) {
-
   		turn_count_r = 0;
   		turn_count_l ++;
-
   	} else {
-
   		turn_count_l = 0;
   		turn_count_r = 0;
-
   	}
 
-  	if (turn_count_r > 5) {
+  	if (turn_count_r > 0) {
 
-  	  	sprintf(b, "RIGHT TURN\r\n");
-  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//  	  	sprintf(b, "RIGHT TURN\r\n");
+//  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
-  		duty_r = -1*MAX_DUTY*0.7;
+  		duty_r = -1*MAX_DUTY*1;
   		duty_l = MAX_DUTY*1;
-  	} else if (turn_count_l > 5) {
+  	} else if (turn_count_l > 0) {
 
-  	  	sprintf(b, "LEFT TURN\r\n");
-  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//  	  	sprintf(b, "LEFT TURN\r\n");
+//  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
-  		duty_l = -1*MAX_DUTY*0.7;
+  		duty_l = -1*MAX_DUTY*1;
   		duty_r = MAX_DUTY*1;
   	} else {
 
   	  	double delta_r = (kp * error_r - kd * (error_r - prev_r)) / READING_RANGE * DUTY_RANGE;
   	  	double delta_l = (kp * error_l - kd * (error_l - prev_l)) / READING_RANGE * DUTY_RANGE;
 
-  		duty_r = AVG_DUTY - delta_r;
-  		duty_l = AVG_DUTY - delta_l;
+  	  	duty_r = AVG_DUTY - delta_r;
+  	  	duty_l = AVG_DUTY - delta_l;
 
   	    if (duty_l < MIN_DUTY) duty_l = MIN_DUTY;
   	    if (duty_l > MAX_DUTY) duty_l = MAX_DUTY;
@@ -593,8 +706,8 @@ int main(void)
 
   //	sprintf(b, "delta_r %f duty_r %f\r\n", delta_r, duty_r);
   //	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-  	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
-  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//  	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   	prev_r = error_r;
   	prev_l = error_l;
