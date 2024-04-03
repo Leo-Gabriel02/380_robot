@@ -85,10 +85,10 @@ static void MX_I2C1_Init(void);
 #define GAIN_REG 0x80 | 0x0F
 
 enum motors {
-	LSM1,
-	LSM2,
-	RSM1,
-	RSM2
+    LSM1,
+    LSM2,
+    RSM1,
+    RSM2
 };
 
 //const uint16_t M_PINS[4] = {LS_M1_Pin, LS_M2_Pin, RS_M1_Pin, RS_M2_Pin};
@@ -97,31 +97,35 @@ const uint8_t M_DIR[2] = {LS_DIR_Pin, RS_DIR_Pin};
 const double M_SCALE[4] = {1,1,1,1};
 
 const uint8_t SENSOR_REGS[3] = {0x80 | 0x16, 0x80 | 0x18, 0x80 | 0x1A};
-const uint8_t SENSORS[2] = {0, 1};
+const uint8_t SENSORS[] = {2, 3, 4, 5}; // BL, FR, FL, BR
 uint8_t NUM_SENSORS = sizeof(SENSORS)/sizeof(SENSORS[0]);
-
 
 void runMotors(uint8_t side, uint8_t dir, double duty) {
 
-	if (duty < 0) {
-		dir = !dir;
-		duty = abs(duty);
-	}
-	duty = duty * 0.8;
+    char b [100];
 
-	if (duty > 0.8) duty = 0.8;
+    if (duty < 0) {
+        dir = !dir;
+        duty = abs(duty*1000)/1000.0;
+    }
 
-	double duty_adj = dir == BWD ? (1-duty) : duty;
+    duty = duty*0.8;
+    if (duty > 0.8) duty = 0.8;
 
-	if (side == LEFT) {
-		HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == BWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-		TIM1->CCR3 = duty_adj*TIM1->ARR;
-		TIM1->CCR4 = duty_adj*TIM1->ARR;
-	} else {
-		HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == BWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-		TIM1->CCR1 = duty_adj*TIM1->ARR;
-		TIM1->CCR2 = duty_adj*TIM1->ARR;
-	}
+    double duty_adj = dir == FWD ? (1-duty) : duty;
+
+    sprintf(b, "duty %f fwd? %d \r\n", duty_adj, dir == FWD);
+    HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+    if (side == LEFT) {
+        HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        TIM1->CCR1 = duty_adj*TIM1->ARR;
+        TIM1->CCR2 = duty_adj*TIM1->ARR;
+    } else {
+        HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        TIM1->CCR3 = duty_adj*TIM1->ARR;
+        TIM1->CCR4 = duty_adj*TIM1->ARR;
+    }
 }
 
 
@@ -258,7 +262,7 @@ void initSensors() {
 	}
 }
 
-void calibrate(uint16_t* tape_val, uint16_t* wood_val) {
+void autoCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
   char b [100];
 	uint16_t tape = 0;
 	uint16_t wood = 0;
@@ -273,7 +277,7 @@ void calibrate(uint16_t* tape_val, uint16_t* wood_val) {
 	uint16_t count = 1;
 	uint16_t tape_count = 0;
 
-	for (int i = 0; i < NUM_SENSORS; i++) {
+	for (int i = 1; i < 3; i++) {
 		wood_sum += readSensor(SENSORS[i]);
 	}
 	wood_sum /= NUM_SENSORS;
@@ -323,18 +327,41 @@ void calibrate(uint16_t* tape_val, uint16_t* wood_val) {
 	}
 
 
-	*tape_val = tape;
-	*wood_val = wood;
+
 //	runMotors(LEFT, FWD, 0);
 //	runMotors(RIGHT, FWD, 0);
+}
+
+void manCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
+	HAL_Delay(50);
+
+	char b [100];
+
+	uint16_t tape = 0;
+	uint16_t wood = 0;
+
+	uint8_t reads = 10;
+
+	for (int i = 0; i < reads; i++) {
+		tape += readSensor(SENSORS[1]);
+		tape += readSensor(SENSORS[2]);
+		wood += readSensor(SENSORS[0]);
+		wood += readSensor(SENSORS[3]);
+	}
+
+	*tape_val = tape / (2*reads);
+	*wood_val = wood / (2*reads);
+
+	sprintf(b, "wood %d tape %d\r\n", *wood_val, *tape_val);
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 }
 
 const double MAX_DUTY = 0.6;
 const double MIN_DUTY = 0;
 const double AVG_DUTY = 0.4;
-const double DUTY_RANGE = 0.2;
+const double DUTY_RANGE = 0.4;
 
-const double kp = 1.5;
+const double kp = 1;
 
 
 
@@ -413,7 +440,14 @@ int main(void)
 
   HAL_Delay(100);
 
-  calibrate(&tape_val, &wood_val);
+
+  manCalibrate(&tape_val, &wood_val);
+
+  runMotors(LEFT, FWD, 0.5);
+  runMotors(RIGHT, FWD, 0.5);
+
+  HAL_Delay(300);
+
 
   /* USER CODE END 2 */
 
@@ -425,8 +459,8 @@ int main(void)
   	uint16_t TARGET = (tape_val+wood_val)/2;
   	uint16_t READING_RANGE = TARGET - wood_val;
 
-  	uint16_t right = readSensor(SENSORS[0]);
-  	uint16_t left = readSensor(SENSORS[1]);
+  	uint16_t right = readSensor(SENSORS[1]);
+  	uint16_t left = readSensor(SENSORS[2]);
 
   	sprintf(b, "left sensor %d right sensor %d\r\n", right, left);
   	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
@@ -434,18 +468,24 @@ int main(void)
   	int16_t error_r = right - TARGET;
   	int16_t error_l = left - TARGET;
 
-  	sprintf(b, "left %d right %d ", error_l, error_r);
-  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//  	sprintf(b, "left %d right %d ", error_l, error_r);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   	double duty_r;//MIN_DUTY + ratio/(tape/wood)*(MAX_DUTY-MIN_DUTY);//
   	double duty_l;//MIN_DUTY + (1/ratio)/(tape/wood)*(MAX_DUTY-MIN_DUTY); //
 
-  	if (right < wood_val*1.1 && left < 0.5*tape_val) {
-  		duty_r = -MAX_DUTY*0.75;
-  		duty_l = MAX_DUTY*0.75;
-  	} else if (right < wood_val*1.1 && left < 0.5*tape_val) {
-  		duty_l = -MAX_DUTY*0.75;
-  		duty_r = MAX_DUTY*0.75;
+  	if (left < wood_val*1.1 && right < 0.5*(tape_val-wood_val) + wood_val) {
+  	  	sprintf(b, "RIGHT TURN\r\n");
+  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+  		duty_r = -1*MAX_DUTY*0.7;
+  		duty_l = MAX_DUTY*1;
+  	} else if (right < wood_val*1.1 && left < 0.5*(tape_val-wood_val) + wood_val) {
+  	  	sprintf(b, "LEFT TURN\r\n");
+  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
+  		duty_l = -1*MAX_DUTY*0.7;
+  		duty_r = MAX_DUTY*1;
   	} else {
   	  	double delta_r = (kp * error_r ) / READING_RANGE * DUTY_RANGE;
   	  	double delta_l = (kp * error_l ) / READING_RANGE * DUTY_RANGE;
@@ -461,13 +501,11 @@ int main(void)
 
   //	sprintf(b, "delta_r %f duty_r %f\r\n", delta_r, duty_r);
   //	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
   	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
   	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   	runMotors(RIGHT, FWD, duty_r);
   	runMotors(LEFT, FWD, duty_l);
-
 
   //	HAL_Delay(1000);
 
