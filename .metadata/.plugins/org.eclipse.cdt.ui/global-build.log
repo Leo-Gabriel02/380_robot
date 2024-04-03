@@ -1,236 +1,4 @@
-03:35:01 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  44668	    476	   2476	  47620	   ba04	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:35:05 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-size  380_robot_code.elf 
-   text	   data	    bss	    dec	    hex	filename
-  44668	    476	   2476	  47620	   ba04	380_robot_code.elf
-Finished building: default.size.stdout
- 
-03:36:09 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  44556	    476	   2476	  47508	   b994	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:37:34 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  43940	    476	   2476	  46892	   b72c	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:38:59 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  43940	    476	   2476	  46892	   b72c	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:40:31 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  44596	    476	   2476	  47548	   b9bc	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:42:36 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  42636	    476	   2476	  45588	   b214	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:42:57 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  42636	    476	   2476	  45588	   b214	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:51:41 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  42748	    476	   2476	  45700	   b284	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:52:10 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  42748	    476	   2476	  45700	   b284	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:52:40 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  44700	    476	   2476	  47652	   ba24	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-03:59:54 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  45260	    476	   2476	  48212	   bc54	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-04:08:08 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  45260	    476	   2476	  48212	   bc54	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-04:11:39 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  45268	    476	   2476	  48220	   bc5c	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-04:13:29 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  45260	    476	   2476	  48212	   bc54	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-04:15:46 **** Incremental Build of configuration Debug for project 380_robot_code ****
-make -j16 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
-Finished building target: 380_robot_code.elf
- 
-arm-none-eabi-size  380_robot_code.elf 
-arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
-   text	   data	    bss	    dec	    hex	filename
-  45252	    476	   2476	  48204	   bc4c	380_robot_code.elf
-Finished building: default.size.stdout
- 
-Finished building: 380_robot_code.list
- 
-04:16:53 **** Incremental Build of configuration Debug for project 380_robot_code ****
+12:42:38 **** Incremental Build of configuration Debug for project 380_robot_code ****
 make -j16 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
@@ -241,6 +9,177 @@ arm-none-eabi-size  380_robot_code.elf
 arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
    text	   data	    bss	    dec	    hex	filename
   45228	    476	   2476	  48180	   bc34	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:42:42 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-size  380_robot_code.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45228	    476	   2476	  48180	   bc34	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+12:43:24 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-size  380_robot_code.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45228	    476	   2476	  48180	   bc34	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+12:43:49 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  44348	    476	   2476	  47300	   b8c4	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:45:37 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  44372	    476	   2476	  47324	   b8dc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:47:27 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  44388	    476	   2476	  47340	   b8ec	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:48:16 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  44404	    476	   2476	  47356	   b8fc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:50:04 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-size  380_robot_code.elf 
+   text	   data	    bss	    dec	    hex	filename
+  44404	    476	   2476	  47356	   b8fc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+12:52:22 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  44404	    476	   2476	  47356	   b8fc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:52:59 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  45636	    476	   2476	  48588	   bdcc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:56:11 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  45636	    476	   2476	  48588	   bdcc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+12:58:08 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  45636	    476	   2476	  48588	   bdcc	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+13:07:52 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  45724	    476	   2476	  48676	   be24	380_robot_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: 380_robot_code.list
+ 
+13:14:51 **** Incremental Build of configuration Debug for project 380_robot_code ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32G431xx -c -I../Core/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc -I../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I../Drivers/CMSIS/Include -I../Drivers/BSP/Components/vl53l4cx/modules -I../Drivers/BSP/Components/vl53l4cx/porting -I../Drivers/BSP/Components/vl53l4cx -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "380_robot_code.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\Leo\STM32CubeIDE\380_code\380_robot\380_robot_code\STM32G431KBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="380_robot_code.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.12.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: warning: 380_robot_code.elf has a LOAD segment with RWX permissions
+Finished building target: 380_robot_code.elf
+ 
+arm-none-eabi-size  380_robot_code.elf 
+arm-none-eabi-objdump -h -S 380_robot_code.elf  > "380_robot_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  45860	    476	   2476	  48812	   beac	380_robot_code.elf
 Finished building: default.size.stdout
  
 Finished building: 380_robot_code.list
