@@ -94,6 +94,18 @@ enum motors {
     RSM2
 };
 
+enum {
+	R,
+	G,
+	B
+};
+
+enum states {
+	FOLLOW1,
+	INTERMISSION,
+	FOLLOW2,
+};
+
 //const uint16_t M_PINS[4] = {LS_M1_Pin, LS_M2_Pin, RS_M1_Pin, RS_M2_Pin};
 volatile const uint32_t *M_CCR[4] = {&(TIM1->CCR1), &(TIM1->CCR2), &(TIM1->CCR3), &(TIM1->CCR4)};
 const uint8_t M_DIR[2] = {LS_DIR_Pin, RS_DIR_Pin};
@@ -102,6 +114,8 @@ const double M_SCALE[4] = {1,1,1,1};
 const uint8_t SENSOR_REGS[3] = {0x80 | 0x16, 0x80 | 0x18, 0x80 | 0x1A};
 const uint8_t SENSORS[] = {2, 3, 4, 5}; // BL, FR, FL, BR
 uint8_t NUM_SENSORS = sizeof(SENSORS)/sizeof(SENSORS[0]);
+
+uint16_t rgb[] = {0, 0, 0};
 
 void runMotors(uint8_t side, uint8_t dir, double duty) {
 
@@ -173,7 +187,6 @@ uint16_t readSensor(uint8_t sensor) {
   uint8_t buf16[2];
   char out [100];
   uint16_t val;
-  uint16_t rgb[3];
 
 	for (int i = 0; i < 3; i++) {
     ret = HAL_I2C_Mem_Read(&hi2c1, TCS_ADDR, SENSOR_REGS[i], I2C_MEMADD_SIZE_8BIT, buf16, 2, HAL_MAX_DELAY);
@@ -191,18 +204,21 @@ uint16_t readSensor(uint8_t sensor) {
    	}
 	}
 
+	return getRGB(R);
+
+}
+
+uint16_t getRGB(uint8_t colour) {
 	uint16_t r = rgb[0];
 	uint16_t g = rgb[1];
 	uint16_t b = rgb[2];
 
-	uint16_t val2 = r*1000 / (r + g + b) * 3;
+	uint16_t val2 = rgb[colour]*1000 / (r + g + b) * 3;
 
 //	sprintf(out, "sensor %d  r %d g %d b %d scaled %d\r\n", sensor, r, g, b, val2);
 //	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
 	return val2;
-
-
 }
 
 void initSensors() {
@@ -359,6 +375,7 @@ double getAngle(double theta0) {
 	int16_t x;
 	int16_t y;
 	int16_t z;
+	char out [100];
 
 	readIMURaw(&x, &y, &z);
 
@@ -367,6 +384,9 @@ double getAngle(double theta0) {
 	if (theta < 0) {
 		theta += 360;
 	}
+
+	sprintf(out, "angle %f\r\n", theta - theta0);
+	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
 	return theta - theta0;
 }
@@ -530,6 +550,30 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 }
 
+void rotate180() {
+
+	double theta0 = getAngle(0);
+
+	runMotors(RIGHT, FWD, 0);
+	runMotors(LEFT, FWD, 0);
+	HAL_Delay(500);
+
+	double angle = getAngle(theta0);
+	runMotors(RIGHT, FWD, 0.8);
+	runMotors(LEFT, BWD, 0.8);
+
+	while (angle < 170 || angle > 190) {
+		angle = getAngle(theta0);
+		HAL_Delay(10);
+	}
+
+	runMotors(RIGHT, FWD, 0);
+	runMotors(LEFT, FWD, 0);
+
+	HAL_Delay(500);
+
+}
+
 const double MAX_DUTY = 0.6;
 const double MIN_DUTY = 0;
 const double AVG_DUTY = 0.4;
@@ -635,7 +679,7 @@ int main(void)
   int16_t prev_r = TARGET;
   int16_t prev_l = TARGET;
 
-
+  uint16_t state = FOLLOW1;
 
   /* USER CODE END 2 */
 
@@ -645,7 +689,19 @@ int main(void)
   {
 
   	uint16_t right = readSensor(SENSORS[1]);
+  	uint16_t blue_r = getRGB(B);
+
   	uint16_t left = readSensor(SENSORS[2]);
+  	uint16_t blue_l = getRGB(B);
+
+  	if (state == FOLLOW1 && blue_r > 1000 && blue_l > 1000) {
+  		state = INTERMISSION;
+  		rotate180();
+  		state = FOLLOW2;
+  		continue;
+  	}
+
+
 
 //  	sprintf(b, "left sensor %d right sensor %d\r\n", right, left);
 //  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);

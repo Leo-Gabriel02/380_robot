@@ -95,6 +95,7 @@ void runMotors(uint8_t side, uint8_t dir, double duty);
 void setBit(uint32_t bitMask, uint8_t value);
 void initSensors();
 uint16_t readSensor(uint8_t sensor);
+uint16_t getRGB(uint8_t colour);
 uint8_t selectMuxAddr(uint8_t sensor);
 void calibrate(uint16_t* tape_val, uint16_t* wood_val);
 
