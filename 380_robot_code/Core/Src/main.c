@@ -665,10 +665,10 @@ int main(void)
   		continue;
   	}
 
-  	if (left < wood_val*1.1 && right < 0.5*(tape_val-wood_val) + wood_val) {
+  	if (left < wood_val*1.01 && right < 0.99*(tape_val-wood_val) + wood_val) {
   		turn_count_r ++;
   		turn_count_l = 0;
-  	} else if (right < wood_val*1.1 && left < 0.5*(tape_val-wood_val) + wood_val) {
+  	} else if (right < wood_val*1.01 && left < 0.99*(tape_val-wood_val) + wood_val) {
   		turn_count_r = 0;
   		turn_count_l ++;
   	} else {
@@ -676,18 +676,10 @@ int main(void)
   		turn_count_r = 0;
   	}
 
-  	if (turn_count_r > 0) {
-
-//  	  	sprintf(b, "RIGHT TURN\r\n");
-//  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
+  	if (turn_count_r > 3) {
   		duty_r = -1*MAX_DUTY*1;
   		duty_l = MAX_DUTY*1;
-  	} else if (turn_count_l > 0) {
-
-//  	  	sprintf(b, "LEFT TURN\r\n");
-//  	  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-
+  	} else if (turn_count_l > 3) {
   		duty_l = -1*MAX_DUTY*1;
   		duty_r = MAX_DUTY*1;
   	} else {
