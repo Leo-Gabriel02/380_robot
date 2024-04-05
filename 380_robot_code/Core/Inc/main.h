@@ -67,12 +67,8 @@ void Error_Handler(void);
 #define USART2_TX_GPIO_Port GPIOA
 #define USART2_RX_Pin GPIO_PIN_3
 #define USART2_RX_GPIO_Port GPIOA
-#define SERVO_Pin GPIO_PIN_5
-#define SERVO_GPIO_Port GPIOA
-#define ENC_R_Pin GPIO_PIN_6
-#define ENC_R_GPIO_Port GPIOA
-#define ENC_L_Pin GPIO_PIN_7
-#define ENC_L_GPIO_Port GPIOA
+#define INTAKE_Pin GPIO_PIN_0
+#define INTAKE_GPIO_Port GPIOB
 #define RS_M2_Pin GPIO_PIN_8
 #define RS_M2_GPIO_Port GPIOA
 #define RS_M1_Pin GPIO_PIN_9
@@ -81,12 +77,16 @@ void Error_Handler(void);
 #define LS_M2_GPIO_Port GPIOA
 #define LS_M1_Pin GPIO_PIN_11
 #define LS_M1_GPIO_Port GPIOA
+#define SHOOTER_SERVO_Pin GPIO_PIN_12
+#define SHOOTER_SERVO_GPIO_Port GPIOA
 #define T_SWDIO_Pin GPIO_PIN_13
 #define T_SWDIO_GPIO_Port GPIOA
 #define T_SWCLK_Pin GPIO_PIN_14
 #define T_SWCLK_GPIO_Port GPIOA
 #define T_SWO_Pin GPIO_PIN_3
 #define T_SWO_GPIO_Port GPIOB
+#define NET_SERVO_Pin GPIO_PIN_6
+#define NET_SERVO_GPIO_Port GPIOB
 #define LED_Pin GPIO_PIN_8
 #define LED_GPIO_Port GPIOB
 

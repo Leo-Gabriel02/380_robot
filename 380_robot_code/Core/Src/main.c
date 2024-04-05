@@ -47,8 +47,8 @@ ADC_HandleTypeDef hadc2;
 I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim1;
-TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart2;
 
@@ -63,8 +63,8 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_TIM3_Init(void);
-static void MX_TIM2_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 //static void MX_I2C1_Init(void);
 
@@ -197,8 +197,8 @@ uint16_t readSensor(uint8_t sensor) {
    	} else {
       val = buf16[1] << 8 | buf16[0];
 
-//   		sprintf(b, "%d %d %d\r\n", buf16[1], buf16[0], val);
-//   		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//   		sprintf(out, "%d %d %d\r\n", buf16[1], buf16[0], val);
+//   		HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
    		rgb[i] = val;
    	}
@@ -379,7 +379,7 @@ double getAngle(double theta0) {
 
 	readIMURaw(&x, &y, &z);
 
-	double theta = atan2(z+355, y+5);//atan2(z+350, y+60);
+	double theta = atan2(z+290, y+30);
 	theta = theta * 360 / (2 * M_PI);
 	if (theta < 0) {
 		theta += 360;
@@ -629,15 +629,32 @@ void intakeAndStuff(double theta0) {
 
 }
 
-const double MAX_DUTY = 0.65;
+const double MAX_DUTY = 0.6;
 const double MIN_DUTY = 0;
-const double AVG_DUTY = 0.45;
-const double DUTY_RANGE = 0.45;
+const double AVG_DUTY = 0.4;
+const double DUTY_RANGE = 0.4;
 
 const double kp = 0.8;
 const double kd = 1.2;
 
 
+/* servo shit */
+#define SHOOTER_HOLD 20
+#define SHOOTER_RELEASE 130
+#define NET_HOLD 20
+#define NET_RELEASE 130
+void release_shooter() {
+	TIM4->CCR2 = SHOOTER_RELEASE;
+}
+void hold_shooter() {
+	TIM4->CCR2 = SHOOTER_HOLD;
+}
+void release_net() {
+	TIM4->CCR1 = NET_RELEASE;
+}
+void hold_net() {
+	TIM4->CCR1 = NET_HOLD;
+}
 
 
 /* USER CODE END 0 */
@@ -676,8 +693,8 @@ int main(void)
   MX_TIM1_Init();
   MX_ADC2_Init();
   MX_TIM3_Init();
-  MX_TIM2_Init();
   MX_I2C1_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   //MX_I2C1_Init();
 //  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
@@ -692,6 +709,8 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1); // net release
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2); //shooter release
 
   // Make sure all motors are stopped
   TIM1->CCR1 = 0;
@@ -704,6 +723,11 @@ int main(void)
   HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_RESET);
 
+  hold_shooter();
+  release_net();
+
+  HAL_Delay(300);
+
   char b [100];
 
   sprintf(b, "hello world \r\n");
@@ -712,11 +736,13 @@ int main(void)
   initSensors();
   initIMU();
 
-  runMotors(LEFT, BWD, 0.7);
-  runMotors(RIGHT, FWD, 0.7);
-  while (1) {
-  	getAngle(0);
-  }
+
+//  runMotors(LEFT, BWD, 0.5);
+//  runMotors(RIGHT, FWD, 0.5);
+//  while (1) {
+//  	getAngle(0);
+//  	HAL_Delay(10);
+//  }
 
 
   uint16_t tape_val;
@@ -1093,55 +1119,6 @@ static void MX_TIM1_Init(void)
 }
 
 /**
-  * @brief TIM2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM2_Init(void)
-{
-
-  /* USER CODE BEGIN TIM2_Init 0 */
-
-  /* USER CODE END TIM2_Init 0 */
-
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
-
-  /* USER CODE BEGIN TIM2_Init 1 */
-
-  /* USER CODE END TIM2_Init 1 */
-  htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
-  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4.294967295E9;
-  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM2_Init 2 */
-
-  /* USER CODE END TIM2_Init 2 */
-  HAL_TIM_MspPostInit(&htim2);
-
-}
-
-/**
   * @brief TIM3 Initialization Function
   * @param None
   * @retval None
@@ -1154,7 +1131,6 @@ static void MX_TIM3_Init(void)
   /* USER CODE END TIM3_Init 0 */
 
   TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_IC_InitTypeDef sConfigIC = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM3_Init 1 */
@@ -1166,10 +1142,6 @@ static void MX_TIM3_Init(void)
   htim3.Init.Period = 65535;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_IC_Init(&htim3) != HAL_OK)
-  {
-    Error_Handler();
-  }
   if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
   {
     Error_Handler();
@@ -1177,18 +1149,6 @@ static void MX_TIM3_Init(void)
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
-  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-  sConfigIC.ICFilter = 0;
-  if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -1204,6 +1164,59 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 2 */
   HAL_TIM_MspPostInit(&htim3);
+
+}
+
+/**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 1440;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 1000;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+
+  /* USER CODE END TIM4_Init 2 */
+  HAL_TIM_MspPostInit(&htim4);
 
 }
 
