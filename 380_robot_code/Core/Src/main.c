@@ -101,7 +101,9 @@ enum {
 };
 
 enum states {
-	FOLLOW1,
+	FOLLOW1_FAR,
+	FOLLOW1_MID,
+	FOLLOW1_CLOSE,
 	INTERMISSION,
 	FOLLOW2,
 };
@@ -135,12 +137,12 @@ void runMotors(uint8_t side, uint8_t dir, double duty) {
 //    HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
     if (side == LEFT) {
-        HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-        TIM1->CCR1 = duty_adj*TIM1->ARR;
-        TIM1->CCR2 = duty_adj*TIM1->ARR;
-    } else {
         HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-        TIM1->CCR3 = duty_adj*TIM1->ARR;
+        TIM1->CCR1 = duty_adj*TIM1->ARR;
+      //  TIM1->CCR2 = duty_adj*TIM1->ARR;
+    } else {
+        HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
+       // TIM1->CCR3 = duty_adj*TIM1->ARR;
         TIM1->CCR4 = duty_adj*TIM1->ARR;
     }
 }
@@ -172,8 +174,8 @@ uint8_t selectMuxAddr(uint8_t sensor) {
  		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
  		return 0;
  	} else {
-// 		sprintf(b, "connected to sensor %d\r\n", sensor);
-// 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+ 		sprintf(b, "connected to sensor %d\r\n", sensor);
+ 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
  		return 1;
  	}
 }
@@ -196,13 +198,16 @@ uint16_t readSensor(uint8_t sensor) {
    		HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
    	} else {
       val = buf16[1] << 8 | buf16[0];
-
-//   		sprintf(out, "%d %d %d\r\n", buf16[1], buf16[0], val);
+//
+//   		sprintf(out, "sensor %d reading %d %d %d\r\n", sensor, buf16[1], buf16[0], val);
 //   		HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
    		rgb[i] = val;
    	}
 	}
+
+//		sprintf(out, "sensor %d read %d \r\n", sensor, getRGB(R));
+//		HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
 	return getRGB(R);
 
@@ -232,10 +237,22 @@ void initSensors() {
   gain = 0x03;
   enable = 0x01;
 
+	sprintf(b, "yellow %d\r\n", sizeof(SENSORS)/sizeof(SENSORS[0]));
+	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
 	for (int i = 0; i < sizeof(SENSORS)/sizeof(SENSORS[0]); i++) {
+		sprintf(b, "BRUH %d\r\n", i);
+		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 		if (!selectMuxAddr(SENSORS[i])) {
+			sprintf(b, "bad %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 				continue;
+		} else {
+			sprintf(b, "green %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 		}
+		sprintf(b, "A %d\r\n", ret);
+		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
 		// Write integration time
 	  ret = HAL_I2C_Mem_Write(&hi2c1, TCS_ADDR, INT_REG, I2C_MEMADD_SIZE_8BIT, &int_time, 1, HAL_MAX_DELAY);
@@ -244,6 +261,9 @@ void initSensors() {
 			sprintf(b, "fail 1 %d\r\n", ret);
 			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 			return;
+		} else {
+			sprintf(b, "b %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 		}
 
 	  ret = HAL_I2C_Mem_Write(&hi2c1, TCS_ADDR, GAIN_REG, I2C_MEMADD_SIZE_8BIT, &gain, 1, HAL_MAX_DELAY);
@@ -252,6 +272,9 @@ void initSensors() {
 			sprintf(b, "fail 2 %d\r\n", ret);
 			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 			return;
+		} else {
+			sprintf(b, "c %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 		}
 
 	  HAL_Delay(3);
@@ -262,6 +285,9 @@ void initSensors() {
 			sprintf(b, "fail 1 %d\r\n", ret);
 			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 			return;
+		} else {
+			sprintf(b, "d %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 		}
 
 	  enable |= 0x02;
@@ -274,6 +300,9 @@ void initSensors() {
 			sprintf(b, "fail 1 %d\r\n", ret);
 			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 			return;
+		} else {
+			sprintf(b, "e %d\r\n", ret);
+			HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 		}
 
 	  HAL_Delay(300);
@@ -379,7 +408,7 @@ double getAngle(double theta0) {
 
 	readIMURaw(&x, &y, &z);
 
-	double theta = atan2(z+290, y+30);
+	double theta = atan2(z+295, y+33);
 	theta = theta * 360 / (2 * M_PI);
 	if (theta < 0) {
 		theta += 360;
@@ -489,7 +518,7 @@ void manCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 }
 
-void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
+void midCalibrate(uint16_t* tape_val, uint16_t* wood_val, double* theta0) {
 	HAL_Delay(50);
 
 		char b [100];
@@ -505,6 +534,8 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 		uint16_t count = 1;
 		uint16_t tape_count = 0;
 
+		double theta_sum = getAngle(0);
+
 		for (int i = 0; i < reads; i++) {
 			tape += readSensor(SENSORS[1]);
 			tape += readSensor(SENSORS[2]);
@@ -516,6 +547,11 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 
 		while (1) {
 				count++;
+				double theta = getAngle(0);
+				theta_sum += theta;
+//				sprintf(b, "theta now %f   theta total %f\r\n", theta, theta_sum/count);
+//				HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
 				avg_reading = 0;
 
 				avg_reading += readSensor(SENSORS[0]);
@@ -527,8 +563,8 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 					wood_sum += avg_reading;
 					wood = wood_sum / count;
 
-					sprintf(b, "wood %d\r\n", wood);
-					HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+//					sprintf(b, "wood %d\r\n", wood);
+//					HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
 					if (tape_count > 0) {
 						tape_count = 0;
@@ -549,6 +585,7 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 
 		*tape_val = tape / (2*reads);
 		*wood_val = wood;
+		*theta0 = theta_sum/count;
 
 		sprintf(b, "wood %d tape %d\r\n", *wood_val, *tape_val);
 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
@@ -579,14 +616,30 @@ void rotateToAngle(double target, double theta0, uint8_t DIR) {
 
 }
 
-void shoot() {
-	HAL_Delay(2000);
+/* servo shit */
+#define SHOOTER_HOLD 20
+#define SHOOTER_RELEASE 130
+#define NET_HOLD 20
+#define NET_RELEASE 130
+void release_shooter() {
+	TIM4->CCR1 = SHOOTER_RELEASE;
+}
+void hold_shooter() {
+	TIM4->CCR1 = SHOOTER_HOLD;
+}
+void release_net() {
+	TIM4->CCR2 = NET_RELEASE;
+}
+void hold_net() {
+	TIM4->CCR2 = NET_HOLD;
 }
 
+#define INTAKE_DUTY 0.65
+
 void intakeAndStuff(double theta0) {
-	runMotors(RIGHT, FWD, 0);
-	runMotors(LEFT, FWD, 0);
-	HAL_Delay(500);
+//	runMotors(RIGHT, FWD, 0);
+//	runMotors(LEFT, FWD, 0);
+//	HAL_Delay(500);
 
 	runMotors(RIGHT, BWD, 0.5);
 	runMotors(LEFT, BWD, 0.5);
@@ -595,9 +648,8 @@ void intakeAndStuff(double theta0) {
 	runMotors(LEFT, FWD, 0);
 	HAL_Delay(200);
 
-
 	// DO NOT MAKE DUTY MORE THAN 0.8
-	TIM3->CCR3 = 0.65*TIM3->ARR;
+	TIM3->CCR3 = INTAKE_DUTY*TIM3->ARR;
 
 	if(getAngle(theta0) > 270 )
 			rotateToAngle(270, theta0, LEFT);
@@ -607,7 +659,7 @@ void intakeAndStuff(double theta0) {
 	runMotors(RIGHT, FWD, 0.25);
 	runMotors(LEFT, FWD, 0.25);
 
-	HAL_Delay(300);
+	HAL_Delay(400);
 
 	runMotors(RIGHT, FWD, 0);
 	runMotors(LEFT, FWD, 0);
@@ -616,16 +668,17 @@ void intakeAndStuff(double theta0) {
 
 	rotateToAngle(225, theta0, LEFT);
 
-	HAL_Delay(100);
+	TIM3->CCR3 = 0;
 
-	shoot();
+	HAL_Delay(300);
+
+	release_shooter();
 
 	HAL_Delay(300);
 
 	rotateToAngle(90, theta0, LEFT);
 
-	runMotors(RIGHT, FWD, 0.6);
-	runMotors(LEFT, FWD, 0.4);
+	while(1) {}
 
 }
 
@@ -638,23 +691,7 @@ const double kp = 0.8;
 const double kd = 1.2;
 
 
-/* servo shit */
-#define SHOOTER_HOLD 20
-#define SHOOTER_RELEASE 130
-#define NET_HOLD 20
-#define NET_RELEASE 130
-void release_shooter() {
-	TIM4->CCR2 = SHOOTER_RELEASE;
-}
-void hold_shooter() {
-	TIM4->CCR2 = SHOOTER_HOLD;
-}
-void release_net() {
-	TIM4->CCR1 = NET_RELEASE;
-}
-void hold_net() {
-	TIM4->CCR1 = NET_HOLD;
-}
+
 
 
 /* USER CODE END 0 */
@@ -726,6 +763,21 @@ int main(void)
   hold_shooter();
   release_net();
 
+//  while(1) {
+//  	hold_shooter();
+//  	HAL_Delay(7000);
+//  	release_shooter();
+//  	HAL_Delay(7000);
+//  }
+//
+//  while(1) {
+//  	readSensor(SENSORS[0]);
+//  	readSensor(SENSORS[1]);
+//  	readSensor(SENSORS[2]);
+//  	readSensor(SENSORS[3]);
+//  	HAL_Delay(1000);
+//  }
+
   HAL_Delay(300);
 
   char b [100];
@@ -735,10 +787,17 @@ int main(void)
 
   initSensors();
   initIMU();
+//
+//  while (1) {
+//  	release_shooter();
+//  	HAL_Delay(1000);
+//  	hold_shooter();
+//  	HAL_Delay(1000);
+//  }
 
-
-//  runMotors(LEFT, BWD, 0.5);
-//  runMotors(RIGHT, FWD, 0.5);
+//
+//  runMotors(LEFT, BWD, 0.6);
+//  runMotors(RIGHT, FWD, 0.6);
 //  while (1) {
 //  	getAngle(0);
 //  	HAL_Delay(10);
@@ -761,15 +820,15 @@ int main(void)
 //  	HAL_Delay(5000);
 //  }
 
-  midCalibrate(&tape_val, &wood_val);
+  midCalibrate(&tape_val, &wood_val, &theta0);
 
   uint16_t TARGET = (tape_val+wood_val)/2;
   uint16_t READING_RANGE = TARGET - wood_val;
 
-  runMotors(LEFT, FWD, 0.5);
-  runMotors(RIGHT, FWD, 0.5);
+//  runMotors(LEFT, FWD, 0.5);
+//  runMotors(RIGHT, FWD, 0.5);
 
-  HAL_Delay(300);
+//  HAL_Delay(300);
 
   uint16_t turn_count_l = 0;
   uint16_t turn_count_r = 0;
@@ -777,7 +836,9 @@ int main(void)
   int16_t prev_r = TARGET;
   int16_t prev_l = TARGET;
 
-  uint16_t state = FOLLOW1;
+  uint16_t state = FOLLOW1_FAR;
+
+  uint16_t angle_count = 0;
 
   /* USER CODE END 2 */
 
@@ -792,12 +853,39 @@ int main(void)
   	uint16_t left = readSensor(SENSORS[2]);
   	uint16_t blue_l = getRGB(B);
 
-  	if (state == FOLLOW1 && (blue_r > 1000 || blue_l > 1000)) {
+  	if (state < INTERMISSION && (blue_r > 1000 || blue_l > 1000)) {
   		state = INTERMISSION;
   		intakeAndStuff(theta0);
   		state = FOLLOW2;
   		continue;
   	}
+
+//  	double angle = getAngle(theta0);
+//  	if (state == FOLLOW1_FAR) {
+//			if (angle > 70 && angle < 110) {
+//				angle_count++;
+//			} else {
+//				angle_count = 0;
+//			}
+//
+//			if (angle_count >= 15) {
+//				state = FOLLOW1_MID;
+//				angle_count = 0;
+//			}
+//  	} else if (state == FOLLOW1_MID) {
+//			if (angle > 340 || angle < 20) {
+//				angle_count++;
+//			} else {
+//				angle_count = 0;
+//			}
+//
+//			if (angle_count >= 15) {
+//				state = FOLLOW1_FAR;
+//				angle_count = 0;
+//				// DO NOT MAKE DUTY MORE THAN 0.8
+//				TIM3->CCR3 = INTAKE_DUTY*TIM3->ARR;
+//			}
+//  	}
 
 
 
@@ -852,11 +940,18 @@ int main(void)
 
   //	sprintf(b, "delta_r %f duty_r %f\r\n", delta_r, duty_r);
   //	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
-//  	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
-//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
+
 
   	prev_r = error_r;
   	prev_l = error_l;
+
+  	if (state == FOLLOW1_FAR) {
+  		duty_r = duty_r*0.75;
+  		duty_l = duty_l*0.75;
+  	}
+
+//  	sprintf(b, "left duty %f right duty %f\r\n", duty_l*100, duty_r*100);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   	runMotors(RIGHT, FWD, duty_r);
   	runMotors(LEFT, FWD, duty_l);
