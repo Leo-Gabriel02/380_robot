@@ -135,12 +135,10 @@ void runMotors(uint8_t side, uint8_t dir, double duty) {
 //    HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
     if (side == LEFT) {
-        HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-        TIM1->CCR1 = duty_adj*TIM1->ARR;
-        TIM1->CCR2 = duty_adj*TIM1->ARR;
-    } else {
         HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
-        TIM1->CCR3 = duty_adj*TIM1->ARR;
+        TIM1->CCR1 = duty_adj*TIM1->ARR;
+    } else {
+        HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, dir == FWD ? GPIO_PIN_SET : GPIO_PIN_RESET);
         TIM1->CCR4 = duty_adj*TIM1->ARR;
     }
 }
@@ -379,7 +377,7 @@ double getAngle(double theta0) {
 
 	readIMURaw(&x, &y, &z);
 
-	double theta = atan2(z+350, y+60);
+	double theta = atan2(z+295, y+33);
 	theta = theta * 360 / (2 * M_PI);
 	if (theta < 0) {
 		theta += 360;
