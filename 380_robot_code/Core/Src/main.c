@@ -355,8 +355,8 @@ void readIMURaw(int16_t* x, int16_t* y, int16_t* z) {
   	*y = data[3] << 8 | data[2];
   	*z = data[5] << 8 | data[4];
 
-  	sprintf(out, "x %d y %d z %d \r\n", *x, *y, *z);
-  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+//  	sprintf(out, "x %d y %d z %d \r\n", *x, *y, *z);
+//  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
   }
 
 
@@ -379,16 +379,22 @@ double getAngle(double theta0) {
 
 	readIMURaw(&x, &y, &z);
 
-	double theta = atan2(z+200, y-25);
+	double theta = atan2(z+350, y+60);
 	theta = theta * 360 / (2 * M_PI);
 	if (theta < 0) {
 		theta += 360;
 	}
 
-	sprintf(out, "angle %f\r\n", theta - theta0);
+	double output = theta - theta0;
+
+	if (output < 0) {
+		output += 360;
+	}
+
+	sprintf(out, "angle %f\r\n", output);
 	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
-	return theta - theta0;
+	return output;
 }
 
 void autoCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
@@ -406,10 +412,9 @@ void autoCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 	uint16_t count = 1;
 	uint16_t tape_count = 0;
 
-	for (int i = 1; i < 3; i++) {
-		wood_sum += readSensor(SENSORS[i]);
-	}
-	wood_sum /= NUM_SENSORS;
+	wood_sum += readSensor(SENSORS[0]);
+	wood_sum += readSensor(SENSORS[3]);
+	wood_sum /= 2;
 	wood = wood_sum;
 
 	sprintf(b, "wood %d\r\n", wood);
@@ -419,10 +424,9 @@ void autoCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 		count++;
 		avg_reading = 0;
 
-		for (int i = 0; i < NUM_SENSORS; i++) {
-			avg_reading += readSensor(SENSORS[i]);
-		}
-		avg_reading /= NUM_SENSORS;
+		avg_reading += readSensor(SENSORS[0]);
+		avg_reading += readSensor(SENSORS[3]);
+		avg_reading /= 2;
 
 		if (abs(avg_reading - wood) <= wood*0.3) {
 
@@ -550,9 +554,7 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 }
 
-void rotate180() {
-
-	double theta0 = getAngle(0);
+void rotate180(double theta0) {
 
 	runMotors(RIGHT, FWD, 0);
 	runMotors(LEFT, FWD, 0);
@@ -562,16 +564,37 @@ void rotate180() {
 	runMotors(RIGHT, FWD, 0.8);
 	runMotors(LEFT, BWD, 0.8);
 
-	while (angle < 170 || angle > 190) {
+	while (angle < 75 || angle > 105) {
 		angle = getAngle(theta0);
-		HAL_Delay(10);
+		//HAL_Delay(10);
 	}
 
 	runMotors(RIGHT, FWD, 0);
 	runMotors(LEFT, FWD, 0);
 
+	HAL_Delay(300);
+
+	runMotors(RIGHT, FWD, 0.5);
+	runMotors(LEFT, FWD, 0.5);
+
+}
+
+void intake() {
+	runMotors(RIGHT, FWD, 0);
+	runMotors(LEFT, FWD, 0);
 	HAL_Delay(500);
 
+	// DO NOT MAKE DUTY MORE THAN 0.8
+	TIM3->CCR3 = 0.5*TIM3->ARR;
+
+	runMotors(RIGHT, FWD, 0.25);
+	runMotors(LEFT, FWD, 0.25);
+	HAL_Delay(350);
+
+	runMotors(RIGHT, FWD, 0);
+	runMotors(LEFT, FWD, 0);
+
+	while(1) {}
 }
 
 const double MAX_DUTY = 0.6;
@@ -636,6 +659,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 
   // Make sure all motors are stopped
   TIM1->CCR1 = 0;
@@ -643,12 +667,31 @@ int main(void)
   TIM1->CCR3 = 0;
   TIM1->CCR4 = 0;
 
+  TIM3->CCR3 = 0;
+
   HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_RESET);
 
+////  runMotors(LEFT, FWD, .5);
+////  runMotors(RIGHT, FWD, .5);
+////  HAL_Delay(2000);
+////  runMotors(LEFT, BWD, .5);
+////  runMotors(RIGHT, BWD, .5);
+////  HAL_Delay(2000);
+//  HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_SET);
+//  TIM1->CCR1 = 1*TIM1->ARR;
+//  TIM1->CCR2 = 0.5*TIM1->ARR;
+//
+//  HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
+//  TIM1->CCR3 = 0.5*TIM1->ARR;
+//  TIM1->CCR4 = 0*TIM1->ARR;
+//  HAL_Delay(2000);
+//
+//  while(1){}
+
   char b [100];
 
-  sprintf(b, "left sensor right sensor \r\n");
+  sprintf(b, "hello world \r\n");
   HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 
   initSensors();
@@ -662,6 +705,14 @@ int main(void)
 
   double theta0 = getAngle(0);
 
+//  while(1) {
+//  	runMotors(LEFT, FWD, 0.8);
+//  	runMotors(RIGHT, BWD, 0.8);
+//  	HAL_Delay(5000);
+//  	runMotors(LEFT, BWD, 0.8);
+//  	runMotors(RIGHT, FWD, 0.8);
+//  	HAL_Delay(5000);
+//  }
 
   midCalibrate(&tape_val, &wood_val);
 
@@ -696,7 +747,7 @@ int main(void)
 
   	if (state == FOLLOW1 && blue_r > 1000 && blue_l > 1000) {
   		state = INTERMISSION;
-  		rotate180();
+  		rotate180(theta0);
   		state = FOLLOW2;
   		continue;
   	}
@@ -1083,6 +1134,7 @@ static void MX_TIM3_Init(void)
 
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_IC_InitTypeDef sConfigIC = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM3_Init 1 */
 
@@ -1094,6 +1146,10 @@ static void MX_TIM3_Init(void)
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_IC_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -1115,9 +1171,18 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 
