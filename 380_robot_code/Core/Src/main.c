@@ -355,8 +355,8 @@ void readIMURaw(int16_t* x, int16_t* y, int16_t* z) {
   	*y = data[3] << 8 | data[2];
   	*z = data[5] << 8 | data[4];
 
-//  	sprintf(out, "x %d y %d z %d \r\n", *x, *y, *z);
-//  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+  	sprintf(out, "x %d y %d z %d \r\n", *x, *y, *z);
+  	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
   }
 
 
@@ -379,7 +379,7 @@ double getAngle(double theta0) {
 
 	readIMURaw(&x, &y, &z);
 
-	double theta = atan2(z+350, y+60);
+	double theta = atan2(z+355, y+5);//atan2(z+350, y+60);
 	theta = theta * 360 / (2 * M_PI);
 	if (theta < 0) {
 		theta += 360;
@@ -391,8 +391,8 @@ double getAngle(double theta0) {
 		output += 360;
 	}
 
-	sprintf(out, "angle %f\r\n", output);
-	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
+//	sprintf(out, "angle %f\r\n", output);
+//	HAL_UART_Transmit(&huart2, (uint8_t*)out, strlen(out), HAL_MAX_DELAY);
 
 	return output;
 }
@@ -554,17 +554,17 @@ void midCalibrate(uint16_t* tape_val, uint16_t* wood_val) {
 		HAL_UART_Transmit(&huart2, (uint8_t*)b, strlen(b), HAL_MAX_DELAY);
 }
 
-void rotate180(double theta0) {
+void rotateToAngle(double target, double theta0, uint8_t DIR) {
 
-	runMotors(RIGHT, FWD, 0);
-	runMotors(LEFT, FWD, 0);
-	HAL_Delay(500);
+//	runMotors(RIGHT, FWD, 0);
+//	runMotors(LEFT, FWD, 0);
+//	HAL_Delay(500);
 
 	double angle = getAngle(theta0);
-	runMotors(RIGHT, FWD, 0.8);
-	runMotors(LEFT, BWD, 0.8);
+	runMotors(!DIR, FWD, 0.8);
+	runMotors(DIR, BWD, 0.8);
 
-	while (angle < 75 || angle > 105) {
+	while (angle < (target-10) || angle > (target+10)) {
 		angle = getAngle(theta0);
 		//HAL_Delay(10);
 	}
@@ -572,35 +572,67 @@ void rotate180(double theta0) {
 	runMotors(RIGHT, FWD, 0);
 	runMotors(LEFT, FWD, 0);
 
-	HAL_Delay(300);
-
-	runMotors(RIGHT, FWD, 0.5);
-	runMotors(LEFT, FWD, 0.5);
+	HAL_Delay(100);
+//
+//	runMotors(RIGHT, FWD, 0.5);
+//	runMotors(LEFT, FWD, 0.5);
 
 }
 
-void intake() {
+void shoot() {
+	HAL_Delay(2000);
+}
+
+void intakeAndStuff(double theta0) {
 	runMotors(RIGHT, FWD, 0);
 	runMotors(LEFT, FWD, 0);
 	HAL_Delay(500);
 
+	runMotors(RIGHT, BWD, 0.5);
+	runMotors(LEFT, BWD, 0.5);
+	HAL_Delay(300);
+	runMotors(RIGHT, FWD, 0);
+	runMotors(LEFT, FWD, 0);
+	HAL_Delay(200);
+
+
 	// DO NOT MAKE DUTY MORE THAN 0.8
-	TIM3->CCR3 = 0.5*TIM3->ARR;
+	TIM3->CCR3 = 0.65*TIM3->ARR;
+
+	if(getAngle(theta0) > 270 )
+			rotateToAngle(270, theta0, LEFT);
+	else
+			rotateToAngle(270, theta0, RIGHT);
 
 	runMotors(RIGHT, FWD, 0.25);
 	runMotors(LEFT, FWD, 0.25);
-	HAL_Delay(350);
+
+	HAL_Delay(300);
 
 	runMotors(RIGHT, FWD, 0);
 	runMotors(LEFT, FWD, 0);
 
-	while(1) {}
+	HAL_Delay(300);
+
+	rotateToAngle(225, theta0, LEFT);
+
+	HAL_Delay(100);
+
+	shoot();
+
+	HAL_Delay(300);
+
+	rotateToAngle(90, theta0, LEFT);
+
+	runMotors(RIGHT, FWD, 0.6);
+	runMotors(LEFT, FWD, 0.4);
+
 }
 
-const double MAX_DUTY = 0.6;
+const double MAX_DUTY = 0.65;
 const double MIN_DUTY = 0;
-const double AVG_DUTY = 0.4;
-const double DUTY_RANGE = 0.4;
+const double AVG_DUTY = 0.45;
+const double DUTY_RANGE = 0.45;
 
 const double kp = 0.8;
 const double kd = 1.2;
@@ -672,23 +704,6 @@ int main(void)
   HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_RESET);
 
-////  runMotors(LEFT, FWD, .5);
-////  runMotors(RIGHT, FWD, .5);
-////  HAL_Delay(2000);
-////  runMotors(LEFT, BWD, .5);
-////  runMotors(RIGHT, BWD, .5);
-////  HAL_Delay(2000);
-//  HAL_GPIO_WritePin(GPIOA, RS_DIR_Pin, GPIO_PIN_SET);
-//  TIM1->CCR1 = 1*TIM1->ARR;
-//  TIM1->CCR2 = 0.5*TIM1->ARR;
-//
-//  HAL_GPIO_WritePin(GPIOA, LS_DIR_Pin, GPIO_PIN_RESET);
-//  TIM1->CCR3 = 0.5*TIM1->ARR;
-//  TIM1->CCR4 = 0*TIM1->ARR;
-//  HAL_Delay(2000);
-//
-//  while(1){}
-
   char b [100];
 
   sprintf(b, "hello world \r\n");
@@ -696,6 +711,12 @@ int main(void)
 
   initSensors();
   initIMU();
+
+  runMotors(LEFT, BWD, 0.7);
+  runMotors(RIGHT, FWD, 0.7);
+  while (1) {
+  	getAngle(0);
+  }
 
 
   uint16_t tape_val;
@@ -745,9 +766,9 @@ int main(void)
   	uint16_t left = readSensor(SENSORS[2]);
   	uint16_t blue_l = getRGB(B);
 
-  	if (state == FOLLOW1 && blue_r > 1000 && blue_l > 1000) {
+  	if (state == FOLLOW1 && (blue_r > 1000 || blue_l > 1000)) {
   		state = INTERMISSION;
-  		rotate180(theta0);
+  		intakeAndStuff(theta0);
   		state = FOLLOW2;
   		continue;
   	}
@@ -784,11 +805,11 @@ int main(void)
   	}
 
   	if (turn_count_r > 3) {
-  		duty_r = -1*MAX_DUTY*1;
-  		duty_l = MAX_DUTY*1;
+  		duty_r = -0.6;
+  		duty_l = 0.6;
   	} else if (turn_count_l > 3) {
-  		duty_l = -1*MAX_DUTY*1;
-  		duty_r = MAX_DUTY*1;
+  		duty_l = -0.6;
+  		duty_r = 0.6;
   	} else {
 
   	  	double delta_r = (kp * error_r - kd * (error_r - prev_r)) / READING_RANGE * DUTY_RANGE;
